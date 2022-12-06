@@ -1,5 +1,6 @@
 const gridEl = document.getElementById('grid');
 const scoreEl = document.getElementById('score');
+const nextEl = document.getElementById('next');
 
 const pieces = [
   {
@@ -105,6 +106,19 @@ for (let i = 0; i < height; i++) {
   }
 }
 
+const nextGrid = [];
+const nextWidth = 4;
+const nextHeight = 20;
+for (let i = 0; i < nextHeight; i++) {
+  nextGrid.push([]);
+  for (let j = 0; j < nextWidth; j++) {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    nextEl.appendChild(cell);
+    nextGrid[i].push({ col: COLOR_BLANK, cell });
+  }
+}
+
 function updateDOM() {
   grid.forEach((row, i) => {
     row.forEach((cell, j) => {
@@ -116,6 +130,16 @@ function updateDOM() {
     });
   });
   scoreEl.innerText = `Score: ${score}`;
+  // show next pieces
+  nextGrid.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      if (cell.col !== COLOR_BLANK) {
+        cell.cell.style.setProperty('--cell-color', cell.col);
+      } else {
+        cell.cell.style.removeProperty('--cell-color');
+      }
+    });
+  });
 }
 
 const keysDown = {};
@@ -142,12 +166,13 @@ let gravityCounter = 0;
 
 const bag = [];
 function newPiece() {
-  if (bag.length === 0) {
-    bag.push(...pieces);
-    for (let i = bag.length - 1; i > 0; i--) {
+  while (bag.length <= 7) {
+    let temp = [...pieces];
+    for (let i = temp.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [bag[i], bag[j]] = [bag[j], bag[i]];
+      [temp[i], temp[j]] = [temp[j], temp[i]];
     }
+    bag.push(...temp);
   }
   currX = Math.floor(width / 2) - 1;
   currY = 1;
@@ -336,6 +361,20 @@ const interval = setInterval(() => {
     } else if (fullRows.length >= 4) {
       score += 800;
     }
+  }
+
+  // update nextGrid
+  nextGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.col = COLOR_BLANK;
+    });
+  });
+  for (let i = 0; i < 5; i++) {
+    const showPiece = bag[bag.length - 1 - i];
+    showPiece.shape.forEach((pos) => {
+      const [x, y] = pos;
+      nextGrid[i * 4 + 2 + y][1 + x].col = showPiece.color;
+    });
   }
   updateDOM();
   prevKeysDown = JSON.parse(JSON.stringify(keysDown));

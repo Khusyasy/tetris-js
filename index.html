@@ -11,9 +11,25 @@
         --cell-size: 20px;
       }
 
+      * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+
+      .center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .margin {
+        margin: 4px;
+      }
+
       .grid {
-        width: calc((var(--cell-size) * 10) - 2px);
-        height: calc((var(--cell-size) * 20) - 2px);
+        width: calc((var(--cell-size) * 10));
+        height: calc((var(--cell-size) * 20));
         display: grid;
         grid-template-columns: repeat(10, 1fr);
         grid-template-rows: repeat(20, 1fr);
@@ -22,20 +38,40 @@
       }
 
       .cell {
-        width: calc(var(--cell-size) - 2px);
-        height: calc(var(--cell-size) - 2px);
+        width: calc(var(--cell-size));
+        height: calc(var(--cell-size));
         display: inline-block;
         background-color: var(--cell-color);
         border: 1px solid var(--cell-color, #bfbfbf);
+      }
+
+      .next {
+        --cell-size: 10px;
+        width: calc((var(--cell-size) * 4));
+        height: calc((var(--cell-size) * 20));
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(20, 1fr);
+        background-color: #e0e0e0;
+        border: 1px solid black;
       }
 
     </style>
   </head>
 
   <body>
-    <div id="grid" class="grid">
-    </div>
-    <div id="score"></div>
+    <div class="center">
+      <div id="grid" class="grid margin">
+      </div>
+      <div class="margin">
+        <div>
+          <p>Next</p>
+          <div id="next" class="next">
+          </div>
+        </div>
+        <div id="score"></div>
+      </div>
+      </div>
     <script src="tetris.js"></script>
   </body>
 
