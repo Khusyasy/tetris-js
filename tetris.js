@@ -3,6 +3,18 @@ const scoreEl = document.getElementById('score');
 const holdEl = document.getElementById('hold');
 const nextEl = document.getElementById('next');
 
+const startBtn = document.getElementById('start');
+const resetBtn = document.getElementById('reset');
+
+const keysDown = {};
+let prevKeysDown = {};
+document.addEventListener('keydown', (e) => {
+  keysDown[e.key] = true;
+});
+document.addEventListener('keyup', (e) => {
+  delete keysDown[e.key];
+});
+
 const pieces = [
   {
     name: 'I',
@@ -88,22 +100,30 @@ function rotate(shape, rotation) {
   return rotate(newShape, rotation - 1);
 }
 
-const width = 10;
-const height = 20;
-
-let score = 0;
-const grid = [];
-
 const COLOR_BLANK = '#00000000';
 
-// create grid
-for (let i = 0; i < height; i++) {
-  grid.push([]);
-  for (let j = 0; j < width; j++) {
+class GridCell {
+  constructor(col, htmlEl, isPlaced = false) {
+    this.col = col;
+    this.htmlEl = htmlEl;
+    this.isPlaced = isPlaced;
+  }
+  clear() {
+    this.col = COLOR_BLANK;
+    this.isPlaced = false;
+  }
+}
+
+const playGrid = [];
+const playWidth = 10;
+const playHeight = 20;
+for (let i = 0; i < playHeight; i++) {
+  playGrid.push([]);
+  for (let j = 0; j < playWidth; j++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     gridEl.appendChild(cell);
-    grid[i].push({ col: COLOR_BLANK, cell, isPlaced: false });
+    playGrid[i].push(new GridCell(COLOR_BLANK, cell));
   }
 }
 
@@ -116,7 +136,7 @@ for (let i = 0; i < nextHeight; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     nextEl.appendChild(cell);
-    nextGrid[i].push({ col: COLOR_BLANK, cell });
+    nextGrid[i].push(new GridCell(COLOR_BLANK, cell));
   }
 }
 
@@ -131,17 +151,18 @@ for (let i = 0; i < holdHeight; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     holdEl.appendChild(cell);
-    holdGrid[i].push({ col: COLOR_BLANK, cell });
+    holdGrid[i].push(new GridCell(COLOR_BLANK, cell));
   }
 }
 
+let score = 0;
 function updateDOM() {
-  grid.forEach((row, i) => {
+  playGrid.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
-        cell.cell.style.setProperty('--cell-color', cell.col);
+        cell.htmlEl.style.setProperty('--cell-color', cell.col);
       } else {
-        cell.cell.style.removeProperty('--cell-color');
+        cell.htmlEl.style.removeProperty('--cell-color');
       }
     });
   });
@@ -150,9 +171,9 @@ function updateDOM() {
   nextGrid.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
-        cell.cell.style.setProperty('--cell-color', cell.col);
+        cell.htmlEl.style.setProperty('--cell-color', cell.col);
       } else {
-        cell.cell.style.removeProperty('--cell-color');
+        cell.htmlEl.style.removeProperty('--cell-color');
       }
     });
   });
@@ -160,22 +181,13 @@ function updateDOM() {
   holdGrid.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
-        cell.cell.style.setProperty('--cell-color', cell.col);
+        cell.htmlEl.style.setProperty('--cell-color', cell.col);
       } else {
-        cell.cell.style.removeProperty('--cell-color');
+        cell.htmlEl.style.removeProperty('--cell-color');
       }
     });
   });
 }
-
-const keysDown = {};
-let prevKeysDown = {};
-document.addEventListener('keydown', (e) => {
-  keysDown[e.key] = true;
-});
-document.addEventListener('keyup', (e) => {
-  delete keysDown[e.key];
-});
 
 let currX = 0;
 let currY = 0;
@@ -191,12 +203,12 @@ let gravityInterval = 15;
 let gravityCounter = 0;
 
 function resetPiece() {
-  currX = Math.floor(width / 2) - 1;
+  currX = Math.floor(playWidth / 2) - 1;
   currY = 1;
   currRotation = 0;
 }
 
-const bag = [];
+let bag = [];
 function newPiece() {
   while (bag.length <= 7) {
     let temp = [...pieces];
@@ -210,18 +222,47 @@ function newPiece() {
   currPiece = bag.pop();
 }
 
-newPiece();
-updateDOM();
-const interval = setInterval(() => {
-  const currShape = rotate(currPiece.shape, currRotation);
-  // clear
-  for (let i = 0; i < height; i++) {
-    for (let j = 0; j < width; j++) {
-      if (!grid[i][j].isPlaced) {
-        grid[i][j].col = COLOR_BLANK;
+function clearGrid() {
+  // clear play grid
+  for (let i = 0; i < playHeight; i++) {
+    for (let j = 0; j < playWidth; j++) {
+      if (!playGrid[i][j].isPlaced) {
+        playGrid[i][j].col = COLOR_BLANK;
       }
     }
   }
+  // clear hold grid
+  holdGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.col = COLOR_BLANK;
+    });
+  });
+  // clear next grid
+  nextGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.col = COLOR_BLANK;
+    });
+  });
+}
+
+function newGame() {
+  playGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.clear();
+    });
+  });
+  holdPiece = null;
+  bag = [];
+  clearGrid();
+  newPiece();
+  updateDOM();
+}
+newGame();
+
+let gameInterval = null;
+function gameLoop() {
+  const currShape = rotate(currPiece.shape, currRotation);
+  clearGrid();
 
   // move
   let dx = 0;
@@ -234,7 +275,7 @@ const interval = setInterval(() => {
         canMove = false;
         break;
       }
-      if (grid[currY + py][currX + px - 1].isPlaced) {
+      if (playGrid[currY + py][currX + px - 1].isPlaced) {
         canMove = false;
         break;
       }
@@ -247,11 +288,11 @@ const interval = setInterval(() => {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currShape[i];
-      if (currX + px + 1 >= width) {
+      if (currX + px + 1 >= playWidth) {
         canMove = false;
         break;
       }
-      if (grid[currY + py][currX + px + 1].isPlaced) {
+      if (playGrid[currY + py][currX + px + 1].isPlaced) {
         canMove = false;
         break;
       }
@@ -289,11 +330,11 @@ const interval = setInterval(() => {
     const newShape = rotate(currPiece.shape, newRotation);
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = newShape[i];
-      if (currX + px < 0 || currX + px >= width) {
+      if (currX + px < 0 || currX + px >= playWidth) {
         canRotate = false;
         break;
       }
-      if (grid[currY + py][currX + px].isPlaced) {
+      if (playGrid[currY + py][currX + px].isPlaced) {
         canRotate = false;
         break;
       }
@@ -322,10 +363,10 @@ const interval = setInterval(() => {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currShape[i];
-      if (currY + py + 1 >= height) {
+      if (currY + py + 1 >= playHeight) {
         canMove = false;
         break;
-      } else if (grid[currY + py + 1][currX + px].isPlaced) {
+      } else if (playGrid[currY + py + 1][currX + px].isPlaced) {
         canMove = false;
         break;
       }
@@ -337,8 +378,8 @@ const interval = setInterval(() => {
       // place piece
       for (let i = 0; i < currPiece.shape.length; i++) {
         const [px, py] = currShape[i];
-        if (currY + py < height) {
-          grid[currY + py][currX + px].isPlaced = true;
+        if (currY + py < playHeight) {
+          playGrid[currY + py][currX + px].isPlaced = true;
         }
       }
       reset = true;
@@ -348,17 +389,17 @@ const interval = setInterval(() => {
   for (let i = 0; i < currPiece.shape.length; i++) {
     const [px, py] = currShape[i];
 
-    grid[currY + py][currX + px].col = currPiece.color;
+    playGrid[currY + py][currX + px].col = currPiece.color;
   }
 
   if (reset) {
     newPiece();
     // check for full rows
     const fullRows = [];
-    for (let i = 0; i < height; i++) {
+    for (let i = 0; i < playHeight; i++) {
       let full = true;
-      for (let j = 0; j < width; j++) {
-        if (!grid[i][j].isPlaced) {
+      for (let j = 0; j < playWidth; j++) {
+        if (!playGrid[i][j].isPlaced) {
           full = false;
           continue;
         }
@@ -370,13 +411,13 @@ const interval = setInterval(() => {
     // remove full rows
     for (let i = 0; i < fullRows.length; i++) {
       for (let j = fullRows[i]; j >= 0; j--) {
-        for (let k = 0; k < width; k++) {
+        for (let k = 0; k < playWidth; k++) {
           if (j == 0) {
-            grid[j][k].isPlaced = false;
-            grid[j][k].col = COLOR_BLANK;
+            playGrid[j][k].isPlaced = false;
+            playGrid[j][k].col = COLOR_BLANK;
           } else {
-            grid[j][k].isPlaced = grid[j - 1][k].isPlaced;
-            grid[j][k].col = grid[j - 1][k].col;
+            playGrid[j][k].isPlaced = playGrid[j - 1][k].isPlaced;
+            playGrid[j][k].col = playGrid[j - 1][k].col;
           }
         }
       }
@@ -413,11 +454,6 @@ const interval = setInterval(() => {
   }
 
   // update holdGrid
-  holdGrid.forEach((row) => {
-    row.forEach((cell) => {
-      cell.col = COLOR_BLANK;
-    });
-  });
   if (holdPiece) {
     holdPiece.shape.forEach((pos) => {
       const [x, y] = pos;
@@ -426,11 +462,6 @@ const interval = setInterval(() => {
   }
 
   // update nextGrid
-  nextGrid.forEach((row) => {
-    row.forEach((cell) => {
-      cell.col = COLOR_BLANK;
-    });
-  });
   for (let i = 0; i < 5; i++) {
     const showPiece = bag[bag.length - 1 - i];
     showPiece.shape.forEach((pos) => {
@@ -440,4 +471,26 @@ const interval = setInterval(() => {
   }
   updateDOM();
   prevKeysDown = JSON.parse(JSON.stringify(keysDown));
-}, 1000 / 60);
+}
+
+let playing = false;
+startBtn.addEventListener('click', () => {
+  if (!playing) {
+    playing = true;
+    startBtn.innerText = 'Pause';
+    gameInterval = setInterval(gameLoop, 1000 / 60);
+  } else {
+    playing = false;
+    startBtn.innerText = 'Start';
+    clearInterval(gameInterval);
+  }
+  startBtn.blur();
+});
+
+resetBtn.addEventListener('click', () => {
+  newGame();
+  playing = false;
+  startBtn.innerText = 'Start';
+  clearInterval(gameInterval);
+  resetBtn.blur();
+});
