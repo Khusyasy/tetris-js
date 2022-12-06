@@ -45,6 +45,17 @@
         border: 1px solid var(--cell-color, #bfbfbf);
       }
 
+      .hold {
+        --cell-size: 10px;
+        width: calc((var(--cell-size) * 4));
+        height: calc((var(--cell-size) * 4));
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        background-color: #e0e0e0;
+        border: 1px solid black;
+      }
+
       .next {
         --cell-size: 10px;
         width: calc((var(--cell-size) * 4));
@@ -65,6 +76,11 @@
       </div>
       <div class="margin">
         <div>
+          <p>Hold</p>
+          <div id="hold" class="hold">
+          </div>
+          </div>
+          <div>
           <p>Next</p>
           <div id="next" class="next">
           </div>

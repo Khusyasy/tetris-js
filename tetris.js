@@ -1,5 +1,6 @@
 const gridEl = document.getElementById('grid');
 const scoreEl = document.getElementById('score');
+const holdEl = document.getElementById('hold');
 const nextEl = document.getElementById('next');
 
 const pieces = [
@@ -119,6 +120,21 @@ for (let i = 0; i < nextHeight; i++) {
   }
 }
 
+let holdPiece = null;
+let holdHold = false;
+const holdGrid = [];
+const holdWidth = 4;
+const holdHeight = 4;
+for (let i = 0; i < holdHeight; i++) {
+  holdGrid.push([]);
+  for (let j = 0; j < holdWidth; j++) {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    holdEl.appendChild(cell);
+    holdGrid[i].push({ col: COLOR_BLANK, cell });
+  }
+}
+
 function updateDOM() {
   grid.forEach((row, i) => {
     row.forEach((cell, j) => {
@@ -132,6 +148,16 @@ function updateDOM() {
   scoreEl.innerText = `Score: ${score}`;
   // show next pieces
   nextGrid.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      if (cell.col !== COLOR_BLANK) {
+        cell.cell.style.setProperty('--cell-color', cell.col);
+      } else {
+        cell.cell.style.removeProperty('--cell-color');
+      }
+    });
+  });
+  // show hold piece
+  holdGrid.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.cell.style.setProperty('--cell-color', cell.col);
@@ -164,6 +190,12 @@ let rotateHold = false;
 let gravityInterval = 15;
 let gravityCounter = 0;
 
+function resetPiece() {
+  currX = Math.floor(width / 2) - 1;
+  currY = 1;
+  currRotation = 0;
+}
+
 const bag = [];
 function newPiece() {
   while (bag.length <= 7) {
@@ -174,10 +206,8 @@ function newPiece() {
     }
     bag.push(...temp);
   }
-  currX = Math.floor(width / 2) - 1;
-  currY = 1;
+  resetPiece();
   currPiece = bag.pop();
-  currRotation = 0;
 }
 
 newPiece();
@@ -361,6 +391,38 @@ const interval = setInterval(() => {
     } else if (fullRows.length >= 4) {
       score += 800;
     }
+  }
+
+  // check to swap hold piece
+  if (!holdHold) {
+    if (keysDown['w'] || keysDown['W']) {
+      if (holdPiece) {
+        const temp = holdPiece;
+        holdPiece = currPiece;
+        currPiece = temp;
+        resetPiece();
+      } else {
+        holdPiece = currPiece;
+        newPiece();
+      }
+      holdHold = true;
+    }
+  }
+  if (!keysDown['w'] && !keysDown['W']) {
+    holdHold = false;
+  }
+
+  // update holdGrid
+  holdGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.col = COLOR_BLANK;
+    });
+  });
+  if (holdPiece) {
+    holdPiece.shape.forEach((pos) => {
+      const [x, y] = pos;
+      holdGrid[2 + y][1 + x].col = holdPiece.color;
+    });
   }
 
   // update nextGrid
