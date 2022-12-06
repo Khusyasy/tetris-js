@@ -97,11 +97,23 @@ function updateGrid() {
   });
 }
 
-let currX = 0,
-  currY = 0;
+const keysDown = {};
+document.addEventListener('keydown', (e) => {
+  keysDown[e.key] = true;
+});
+document.addEventListener('keyup', (e) => {
+  delete keysDown[e.key];
+});
+
+let currX = 0;
+let currY = 0;
 let currPiece = null;
-let moveInterval = 10;
+
+let moveInterval = 5;
 let moveCounter = 0;
+
+let gravityInterval = 20;
+let gravityCounter = 0;
 
 function newPiece() {
   currX = Math.floor(width / 2);
@@ -119,25 +131,68 @@ const interval = setInterval(() => {
     grid[currY + py][currX + px].col = '#00000000';
   }
 
+  let dx = 0;
+  // get key input
+  if (keysDown['ArrowLeft'] || keysDown['a'] || keysDown['A']) {
+    let canMove = true;
+    for (let i = 0; i < currPiece.shape.length; i++) {
+      const [px, py] = currPiece.shape[i];
+      if (currX + px - 1 < 0) {
+        canMove = false;
+        break;
+      }
+      if (grid[currY + py][currX + px - 1].isPlaced) {
+        canMove = false;
+        break;
+      }
+    }
+    if (canMove) {
+      dx = -1;
+    }
+  }
+  if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) {
+    let canMove = true;
+    for (let i = 0; i < currPiece.shape.length; i++) {
+      const [px, py] = currPiece.shape[i];
+      if (currX + px + 1 >= width) {
+        canMove = false;
+        break;
+      }
+      if (grid[currY + py][currX + px + 1].isPlaced) {
+        canMove = false;
+        break;
+      }
+    }
+    if (canMove) {
+      dx = 1;
+    }
+  }
   // move
   moveCounter++;
-  let reset = false;
   if (moveCounter >= moveInterval) {
     moveCounter = 0;
+    currX += dx;
+  }
+
+  // gravity
+  gravityCounter++;
+  let reset = false;
+  if (gravityCounter >= gravityInterval) {
+    gravityCounter = 0;
     // check collision
-    let notCollided = true;
+    let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currPiece.shape[i];
       if (currY + py + 1 >= height) {
-        notCollided = false;
+        canMove = false;
         break;
       } else if (grid[currY + py + 1][currX + px].isPlaced) {
-        notCollided = false;
+        canMove = false;
         break;
       }
     }
 
-    if (notCollided) {
+    if (canMove) {
       currY++;
     } else {
       // place piece
