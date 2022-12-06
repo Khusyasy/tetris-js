@@ -15,6 +15,28 @@ document.addEventListener('keyup', (e) => {
   delete keysDown[e.key];
 });
 
+// read from local storage
+let INPUT_CONFIG = null;
+if (localStorage.getItem('tetris-config')) {
+  INPUT_CONFIG = JSON.parse(localStorage.getItem('tetris-config'));
+} else {
+  INPUT_CONFIG = {
+    mv_left: 'a',
+    mv_right: 'd',
+    softdrop: 's',
+    rot_ccw: 'ArrowLeft',
+    rot_cw: 'ArrowRight',
+    hold: 'Shift',
+  };
+}
+
+function getInput(key, prev = false) {
+  if (prev) {
+    return prevKeysDown[INPUT_CONFIG[key]];
+  }
+  return keysDown[INPUT_CONFIG[key]];
+}
+
 const pieces = [
   {
     name: 'I',
@@ -266,8 +288,7 @@ function gameLoop() {
 
   // move
   let dx = 0;
-  // get key input
-  if (keysDown['a'] || keysDown['A']) {
+  if (getInput('mv_left')) {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currShape[i];
@@ -284,7 +305,7 @@ function gameLoop() {
       dx = -1;
     }
   }
-  if (keysDown['d'] || keysDown['D']) {
+  if (getInput('mv_right')) {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currShape[i];
@@ -301,12 +322,7 @@ function gameLoop() {
       dx = 1;
     }
   }
-  if (
-    prevKeysDown['a'] ||
-    prevKeysDown['A'] ||
-    prevKeysDown['d'] ||
-    prevKeysDown['D']
-  ) {
+  if (getInput('mv_left', true) || getInput('mv_right', true)) {
     moveCounter++;
     if (moveCounter >= moveInterval) {
       moveCounter = 0;
@@ -320,10 +336,10 @@ function gameLoop() {
   // rotate
   let canRotate = true;
   let newRotation = currRotation;
-  if (keysDown['q'] || keysDown['Q']) {
+  if (getInput('rot_ccw')) {
     newRotation = (4 + (currRotation - 1)) % 4;
   }
-  if (keysDown['e'] || keysDown['E']) {
+  if (getInput('rot_cw')) {
     newRotation = (4 + (currRotation + 1)) % 4;
   }
   if (newRotation != currRotation) {
@@ -346,7 +362,7 @@ function gameLoop() {
     }
     rotateHold = true;
   }
-  if (!keysDown['q'] && !keysDown['Q'] && !keysDown['e'] && !keysDown['E']) {
+  if (!getInput('rot_ccw') && !getInput('rot_cw')) {
     rotateHold = false;
   }
 
@@ -354,7 +370,7 @@ function gameLoop() {
   gravityCounter++;
   let reset = false;
   let tempGravityInterval = gravityInterval;
-  if (keysDown[' ']) {
+  if (getInput('softdrop')) {
     tempGravityInterval = gravityInterval / 4;
   }
   if (gravityCounter >= tempGravityInterval) {
@@ -436,7 +452,7 @@ function gameLoop() {
 
   // check to swap hold piece
   if (!holdHold) {
-    if (keysDown['w'] || keysDown['W']) {
+    if (getInput('hold')) {
       if (holdPiece) {
         const temp = holdPiece;
         holdPiece = currPiece;
@@ -449,7 +465,7 @@ function gameLoop() {
       holdHold = true;
     }
   }
-  if (!keysDown['w'] && !keysDown['W']) {
+  if (!getInput('hold')) {
     holdHold = false;
   }
 
