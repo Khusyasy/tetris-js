@@ -8,7 +8,7 @@
     <title>Tetris thing</title>
     <style>
       :root {
-        --cell-size: 20px;
+        --cell-size: 2rem;
       }
 
       * {
@@ -46,7 +46,7 @@
       }
 
       .hold {
-        --cell-size: 10px;
+        --cell-size: 1rem;
         width: calc((var(--cell-size) * 4));
         height: calc((var(--cell-size) * 4));
         display: grid;
@@ -57,7 +57,7 @@
       }
 
       .next {
-        --cell-size: 10px;
+        --cell-size: 1rem;
         width: calc((var(--cell-size) * 4));
         height: calc((var(--cell-size) * 20));
         display: grid;
@@ -85,9 +85,11 @@
           <div id="next" class="next">
           </div>
         </div>
-        <div id="score"></div>
       </div>
-      </div>
+    </div>
+    <div class="center">
+      <div id="score"></div>
+    </div>
     <script src="tetris.js"></script>
   </body>
 
