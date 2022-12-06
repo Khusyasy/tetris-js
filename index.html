@@ -12,18 +12,21 @@
       }
 
       .grid {
-        width: calc(var(--cell-size) * 10);
-        height: calc(var(--cell-size) * 20);
+        width: calc((var(--cell-size) * 10) - 2px);
+        height: calc((var(--cell-size) * 20) - 2px);
         display: grid;
         grid-template-columns: repeat(10, 1fr);
         grid-template-rows: repeat(20, 1fr);
+        background-color: #e0e0e0;
+        border: 1px solid black;
       }
 
       .cell {
         width: calc(var(--cell-size) - 2px);
         height: calc(var(--cell-size) - 2px);
-        border: 1px solid black;
         display: inline-block;
+        background-color: var(--cell-color);
+        border: 1px solid var(--cell-color, #bfbfbf);
       }
 
     </style>

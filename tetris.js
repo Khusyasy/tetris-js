@@ -6,10 +6,10 @@ const pieces = [
     name: 'I',
     color: '#00ffff',
     shape: [
-      [-2, -1],
       [-1, -1],
       [0, -1],
       [1, -1],
+      [2, -1],
     ],
   },
   {
@@ -92,6 +92,8 @@ const height = 20;
 let score = 0;
 const grid = [];
 
+const COLOR_BLANK = '#00000000';
+
 // create grid
 for (let i = 0; i < height; i++) {
   grid.push([]);
@@ -99,14 +101,18 @@ for (let i = 0; i < height; i++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     gridEl.appendChild(cell);
-    grid[i].push({ col: '#00000000', cell, isPlaced: false });
+    grid[i].push({ col: COLOR_BLANK, cell, isPlaced: false });
   }
 }
 
 function updateDOM() {
   grid.forEach((row, i) => {
     row.forEach((cell, j) => {
-      cell.cell.style.backgroundColor = cell.col;
+      if (cell.col !== COLOR_BLANK) {
+        cell.cell.style.setProperty('--cell-color', cell.col);
+      } else {
+        cell.cell.style.removeProperty('--cell-color');
+      }
     });
   });
   scoreEl.innerText = `Score: ${score}`;
@@ -143,7 +149,7 @@ function newPiece() {
       [bag[i], bag[j]] = [bag[j], bag[i]];
     }
   }
-  currX = Math.floor(width / 2);
+  currX = Math.floor(width / 2) - 1;
   currY = 1;
   currPiece = bag.pop();
   currRotation = 0;
@@ -157,7 +163,7 @@ const interval = setInterval(() => {
   for (let i = 0; i < height; i++) {
     for (let j = 0; j < width; j++) {
       if (!grid[i][j].isPlaced) {
-        grid[i][j].col = '#00000000';
+        grid[i][j].col = COLOR_BLANK;
       }
     }
   }
@@ -312,7 +318,7 @@ const interval = setInterval(() => {
         for (let k = 0; k < width; k++) {
           if (j == 0) {
             grid[j][k].isPlaced = false;
-            grid[j][k].col = '#00000000';
+            grid[j][k].col = COLOR_BLANK;
           } else {
             grid[j][k].isPlaced = grid[j - 1][k].isPlaced;
             grid[j][k].col = grid[j - 1][k].col;
