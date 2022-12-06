@@ -113,6 +113,7 @@ function updateDOM() {
 }
 
 const keysDown = {};
+let prevKeysDown = {};
 document.addEventListener('keydown', (e) => {
   keysDown[e.key] = true;
 });
@@ -125,7 +126,7 @@ let currY = 0;
 let currPiece = null;
 let currRotation = 0;
 
-let moveInterval = 5;
+let moveInterval = 7;
 let moveCounter = 0;
 
 let rotateHold = false;
@@ -152,11 +153,17 @@ const interval = setInterval(() => {
       }
     }
   }
+  console.log(
+    JSON.stringify({
+      keysDown,
+      prevKeysDown,
+    })
+  );
 
   // move
   let dx = 0;
   // get key input
-  if (keysDown['ArrowLeft'] || keysDown['a'] || keysDown['A']) {
+  if (keysDown['a'] || keysDown['A']) {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currShape[i];
@@ -173,7 +180,7 @@ const interval = setInterval(() => {
       dx = -1;
     }
   }
-  if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) {
+  if (keysDown['d'] || keysDown['D']) {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
       const [px, py] = currShape[i];
@@ -190,8 +197,18 @@ const interval = setInterval(() => {
       dx = 1;
     }
   }
-  moveCounter++;
-  if (moveCounter >= moveInterval) {
+  if (
+    prevKeysDown['a'] ||
+    prevKeysDown['A'] ||
+    prevKeysDown['d'] ||
+    prevKeysDown['D']
+  ) {
+    moveCounter++;
+    if (moveCounter >= moveInterval) {
+      moveCounter = 0;
+      currX += dx;
+    }
+  } else {
     moveCounter = 0;
     currX += dx;
   }
@@ -313,4 +330,5 @@ const interval = setInterval(() => {
     }
   }
   updateDOM();
+  prevKeysDown = JSON.parse(JSON.stringify(keysDown));
 }, 1000 / 60);
