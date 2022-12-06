@@ -232,7 +232,11 @@ const interval = setInterval(() => {
   // gravity
   gravityCounter++;
   let reset = false;
-  if (gravityCounter >= gravityInterval) {
+  let tempGravityInterval = gravityInterval;
+  if (keysDown[' ']) {
+    tempGravityInterval = gravityInterval / 4;
+  }
+  if (gravityCounter >= tempGravityInterval) {
     gravityCounter = 0;
     // check collision
     let canMove = true;
