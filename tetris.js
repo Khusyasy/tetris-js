@@ -134,10 +134,18 @@ let rotateHold = false;
 let gravityInterval = 15;
 let gravityCounter = 0;
 
+const bag = [];
 function newPiece() {
+  if (bag.length === 0) {
+    bag.push(...pieces);
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [bag[i], bag[j]] = [bag[j], bag[i]];
+    }
+  }
   currX = Math.floor(width / 2);
   currY = 1;
-  currPiece = pieces[Math.floor(Math.random() * pieces.length)];
+  currPiece = bag.pop();
   currRotation = 0;
 }
 
@@ -153,12 +161,6 @@ const interval = setInterval(() => {
       }
     }
   }
-  console.log(
-    JSON.stringify({
-      keysDown,
-      prevKeysDown,
-    })
-  );
 
   // move
   let dx = 0;
