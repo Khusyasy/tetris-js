@@ -1,4 +1,5 @@
 const gridEl = document.getElementById('grid');
+const scoreEl = document.getElementById('score');
 
 const pieces = [
   {
@@ -88,6 +89,7 @@ function rotate(shape, rotation) {
 const width = 10;
 const height = 20;
 
+let score = 0;
 const grid = [];
 
 // create grid
@@ -101,12 +103,13 @@ for (let i = 0; i < height; i++) {
   }
 }
 
-function updateGrid() {
+function updateDOM() {
   grid.forEach((row, i) => {
     row.forEach((cell, j) => {
       cell.cell.style.backgroundColor = cell.col;
     });
   });
+  scoreEl.innerText = `Score: ${score}`;
 }
 
 const keysDown = {};
@@ -138,7 +141,7 @@ function newPiece() {
 }
 
 newPiece();
-updateGrid();
+updateDOM();
 const interval = setInterval(() => {
   const currShape = rotate(currPiece.shape, currRotation);
   // clear
@@ -264,8 +267,46 @@ const interval = setInterval(() => {
     grid[currY + py][currX + px].col = currPiece.color;
   }
 
-  updateGrid();
   if (reset) {
     newPiece();
+    // check for full rows
+    const fullRows = [];
+    for (let i = height - 1; i >= 0; i--) {
+      let full = true;
+      for (let j = 0; j < width; j++) {
+        if (!grid[i][j].isPlaced) {
+          full = false;
+          continue;
+        }
+      }
+      if (full) {
+        fullRows.push(i);
+      }
+    }
+    // remove full rows
+    for (let i = 0; i < fullRows.length; i++) {
+      for (let j = fullRows[i]; j >= 0; j--) {
+        for (let k = 0; k < width; k++) {
+          if (j == 0) {
+            grid[j][k].isPlaced = false;
+            grid[j][k].col = '#00000000';
+          } else {
+            grid[j][k].isPlaced = grid[j - 1][k].isPlaced;
+            grid[j][k].col = grid[j - 1][k].col;
+          }
+        }
+      }
+    }
+    // check for continuous full rows
+    if (fullRows.length == 1) {
+      score += 100;
+    } else if (fullRows.length == 2) {
+      score += 300;
+    } else if (fullRows.length == 3) {
+      score += 500;
+    } else if (fullRows.length >= 4) {
+      score += 800;
+    }
   }
+  updateDOM();
 }, 1000 / 60);
