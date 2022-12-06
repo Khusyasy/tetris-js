@@ -292,7 +292,7 @@ const interval = setInterval(() => {
     newPiece();
     // check for full rows
     const fullRows = [];
-    for (let i = height - 1; i >= 0; i--) {
+    for (let i = 0; i < height; i++) {
       let full = true;
       for (let j = 0; j < width; j++) {
         if (!grid[i][j].isPlaced) {
