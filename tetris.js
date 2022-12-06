@@ -73,6 +73,18 @@ const pieces = [
   },
 ];
 
+function rotate(shape, rotation) {
+  if (rotation === 0) {
+    return shape;
+  }
+  const newShape = [];
+  for (let i = 0; i < shape.length; i++) {
+    const [x, y] = shape[i];
+    newShape.push([-y, x]);
+  }
+  return rotate(newShape, rotation - 1);
+}
+
 const width = 10;
 const height = 20;
 
@@ -108,35 +120,43 @@ document.addEventListener('keyup', (e) => {
 let currX = 0;
 let currY = 0;
 let currPiece = null;
+let currRotation = 0;
 
 let moveInterval = 5;
 let moveCounter = 0;
 
-let gravityInterval = 20;
+let rotateHold = false;
+
+let gravityInterval = 15;
 let gravityCounter = 0;
 
 function newPiece() {
   currX = Math.floor(width / 2);
   currY = 1;
   currPiece = pieces[Math.floor(Math.random() * pieces.length)];
+  currRotation = 0;
 }
 
 newPiece();
 updateGrid();
 const interval = setInterval(() => {
+  const currShape = rotate(currPiece.shape, currRotation);
   // clear
-  for (let i = 0; i < currPiece.shape.length; i++) {
-    const [px, py] = currPiece.shape[i];
-
-    grid[currY + py][currX + px].col = '#00000000';
+  for (let i = 0; i < height; i++) {
+    for (let j = 0; j < width; j++) {
+      if (!grid[i][j].isPlaced) {
+        grid[i][j].col = '#00000000';
+      }
+    }
   }
 
+  // move
   let dx = 0;
   // get key input
   if (keysDown['ArrowLeft'] || keysDown['a'] || keysDown['A']) {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = currPiece.shape[i];
+      const [px, py] = currShape[i];
       if (currX + px - 1 < 0) {
         canMove = false;
         break;
@@ -153,7 +173,7 @@ const interval = setInterval(() => {
   if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) {
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = currPiece.shape[i];
+      const [px, py] = currShape[i];
       if (currX + px + 1 >= width) {
         canMove = false;
         break;
@@ -167,11 +187,43 @@ const interval = setInterval(() => {
       dx = 1;
     }
   }
-  // move
   moveCounter++;
   if (moveCounter >= moveInterval) {
     moveCounter = 0;
     currX += dx;
+  }
+
+  // rotate
+  let canRotate = true;
+  let newRotation = currRotation;
+  if (keysDown['q'] || keysDown['Q']) {
+    newRotation = (4 + (currRotation - 1)) % 4;
+  }
+  if (keysDown['e'] || keysDown['E']) {
+    newRotation = (4 + (currRotation + 1)) % 4;
+  }
+  if (newRotation != currRotation) {
+    const newShape = rotate(currPiece.shape, newRotation);
+    for (let i = 0; i < currPiece.shape.length; i++) {
+      const [px, py] = newShape[i];
+      if (currX + px < 0 || currX + px >= width) {
+        canRotate = false;
+        break;
+      }
+      if (grid[currY + py][currX + px].isPlaced) {
+        canRotate = false;
+        break;
+      }
+    }
+  }
+  if (!rotateHold) {
+    if (canRotate) {
+      currRotation = newRotation;
+    }
+    rotateHold = true;
+  }
+  if (!keysDown['q'] && !keysDown['Q'] && !keysDown['e'] && !keysDown['E']) {
+    rotateHold = false;
   }
 
   // gravity
@@ -182,7 +234,7 @@ const interval = setInterval(() => {
     // check collision
     let canMove = true;
     for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = currPiece.shape[i];
+      const [px, py] = currShape[i];
       if (currY + py + 1 >= height) {
         canMove = false;
         break;
@@ -197,7 +249,7 @@ const interval = setInterval(() => {
     } else {
       // place piece
       for (let i = 0; i < currPiece.shape.length; i++) {
-        const [px, py] = currPiece.shape[i];
+        const [px, py] = currShape[i];
         if (currY + py < height) {
           grid[currY + py][currX + px].isPlaced = true;
         }
@@ -207,7 +259,7 @@ const interval = setInterval(() => {
   }
   // draw
   for (let i = 0; i < currPiece.shape.length; i++) {
-    const [px, py] = currPiece.shape[i];
+    const [px, py] = currShape[i];
 
     grid[currY + py][currX + px].col = currPiece.color;
   }
