@@ -101,86 +101,228 @@ const pieces = [
   {
     name: 'I',
     color: '#00ffff',
-    shape: [
-      [-1, -1],
-      [0, -1],
-      [1, -1],
-      [2, -1],
-    ],
+    centerX: 1,
+    centerY: 2,
+    shapes: {
+      0: [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+        [3, 1],
+      ],
+      1: [
+        [2, 0],
+        [2, 1],
+        [2, 2],
+        [2, 3],
+      ],
+      2: [
+        [0, 2],
+        [1, 2],
+        [2, 2],
+        [3, 2],
+      ],
+      3: [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [1, 3],
+      ],
+    },
   },
   {
     name: 'J',
     color: '#0000ff',
-    shape: [
-      [-1, -1],
-      [-1, 0],
-      [0, 0],
-      [1, 0],
-    ],
+    centerX: 1,
+    centerY: 2,
+    shapes: {
+      0: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      1: [
+        [1, 0],
+        [2, 0],
+        [1, 1],
+        [1, 2],
+      ],
+      2: [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+        [2, 2],
+      ],
+      3: [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [0, 2],
+      ],
+    },
   },
   {
     name: 'L',
     color: '#ffa500',
-    shape: [
-      [-1, 0],
-      [0, 0],
-      [1, 0],
-      [1, -1],
-    ],
+    centerX: 1,
+    centerY: 2,
+    shapes: {
+      0: [
+        [2, 0],
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      1: [
+        [1, 0],
+        [1, 1],
+        [1, 2],
+        [2, 2],
+      ],
+      2: [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+        [0, 2],
+      ],
+      3: [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [1, 2],
+      ],
+    },
   },
   {
     name: 'O',
     color: '#ffff00',
-    shape: [
-      [0, 0],
-      [0, 1],
-      [1, 0],
-      [1, 1],
-    ],
+    centerX: 0,
+    centerY: 2,
+    shapes: {
+      0: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1],
+      ],
+      1: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1],
+      ],
+      2: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1],
+      ],
+      3: [
+        [0, 0],
+        [1, 0],
+        [0, 1],
+        [1, 1],
+      ],
+    },
   },
   {
     name: 'S',
     color: '#00ff00',
-    shape: [
-      [-1, 0],
-      [0, 0],
-      [0, -1],
-      [1, -1],
-    ],
+    centerX: 1,
+    centerY: 2,
+    shapes: {
+      0: [
+        [1, 0],
+        [2, 0],
+        [0, 1],
+        [1, 1],
+      ],
+      1: [
+        [1, 0],
+        [1, 1],
+        [2, 1],
+        [2, 2],
+      ],
+      2: [
+        [1, 1],
+        [2, 1],
+        [0, 2],
+        [1, 2],
+      ],
+      3: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+        [1, 2],
+      ],
+    },
   },
   {
     name: 'T',
     color: '#800080',
-    shape: [
-      [-1, 0],
-      [0, 0],
-      [1, 0],
-      [0, -1],
-    ],
+    centerX: 1,
+    centerY: 2,
+    shapes: {
+      0: [
+        [1, 0],
+        [0, 1],
+        [1, 1],
+        [2, 1],
+      ],
+      1: [
+        [1, 0],
+        [1, 1],
+        [2, 1],
+        [1, 2],
+      ],
+      2: [
+        [0, 1],
+        [1, 1],
+        [2, 1],
+        [1, 2],
+      ],
+      3: [
+        [1, 0],
+        [0, 1],
+        [1, 1],
+        [1, 2],
+      ],
+    },
   },
   {
     name: 'Z',
     color: '#ff0000',
-    shape: [
-      [-1, -1],
-      [0, -1],
-      [0, 0],
-      [1, 0],
-    ],
+    centerX: 1,
+    centerY: 2,
+    shapes: {
+      0: [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [2, 1],
+      ],
+      1: [
+        [2, 0],
+        [1, 1],
+        [2, 1],
+        [1, 2],
+      ],
+      2: [
+        [0, 1],
+        [1, 1],
+        [1, 2],
+        [2, 2],
+      ],
+      3: [
+        [1, 0],
+        [0, 1],
+        [1, 1],
+        [0, 2],
+      ],
+    },
   },
 ];
-
-function rotate(shape, rotation) {
-  if (rotation === 0) {
-    return shape;
-  }
-  const newShape = [];
-  for (let i = 0; i < shape.length; i++) {
-    const [x, y] = shape[i];
-    newShape.push([-y, x]);
-  }
-  return rotate(newShape, rotation - 1);
-}
 
 const COLOR_BLANK = '#00000000';
 const COLOR_GHOST = '#33333340';
@@ -282,9 +424,13 @@ let moveCounter = 0;
 let gravityInterval = 15;
 let gravityCounter = 0;
 
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
 function resetPiece() {
   currX = Math.floor(playWidth / 2) - 1;
-  currY = 1;
+  currY = 2;
   currRotation = 0;
 }
 
@@ -300,7 +446,7 @@ function newPiece() {
   }
   resetPiece();
   currPiece = bag.pop();
-  if (!validShapePlace(currPiece.shape, currX, currY)) {
+  if (!validShapePlace(currPiece, 0, currX, currY)) {
     startBtn.innerText = 'Game Over';
     startBtn.disabled = true;
     clearInterval(gameInterval);
@@ -345,9 +491,11 @@ function newGame() {
 }
 newGame();
 
-function validShapePlace(shape, x, y) {
-  for (let i = 0; i < shape.length; i++) {
-    const [px, py] = shape[i];
+function validShapePlace(piece, rotation, x, y) {
+  x = x - piece.centerX;
+  y = y - piece.centerY;
+  for (let i = 0; i < piece.shapes[rotation].length; i++) {
+    const [px, py] = piece.shapes[rotation][i];
     if (
       x + px < 0 ||
       x + px >= playWidth ||
@@ -365,18 +513,17 @@ function validShapePlace(shape, x, y) {
 
 let gameInterval = null;
 function gameLoop() {
-  const currShape = rotate(currPiece.shape, currRotation);
   clearGrid();
 
   // move
   let dx = 0;
   if (getInput('mv_left')) {
-    if (validShapePlace(currShape, currX - 1, currY)) {
+    if (validShapePlace(currPiece, currRotation, currX - 1, currY)) {
       dx = -1;
     }
   }
   if (getInput('mv_right')) {
-    if (validShapePlace(currShape, currX + 1, currY)) {
+    if (validShapePlace(currPiece, currRotation, currX + 1, currY)) {
       dx = 1;
     }
   }
@@ -396,8 +543,7 @@ function gameLoop() {
   if (getInput('rot_ccw')) {
     newRotation = (4 + (currRotation - 1)) % 4;
     if (newRotation != currRotation && !keysHold['rot_ccw']) {
-      const newShape = rotate(currPiece.shape, newRotation);
-      if (validShapePlace(newShape, currX, currY)) {
+      if (validShapePlace(currPiece, newRotation, currX, currY)) {
         currRotation = newRotation;
       }
       keysHold['rot_ccw'] = true;
@@ -408,8 +554,7 @@ function gameLoop() {
   if (getInput('rot_cw')) {
     newRotation = (4 + (currRotation + 1)) % 4;
     if (newRotation != currRotation && !keysHold['rot_cw']) {
-      const newShape = rotate(currPiece.shape, newRotation);
-      if (validShapePlace(newShape, currX, currY)) {
+      if (validShapePlace(currPiece, newRotation, currX, currY)) {
         currRotation = newRotation;
       }
       keysHold['rot_cw'] = true;
@@ -420,8 +565,7 @@ function gameLoop() {
   if (getInput('rot_180')) {
     newRotation = (4 + (currRotation + 2)) % 4;
     if (newRotation != currRotation && !keysHold['rot_180']) {
-      const newShape = rotate(currPiece.shape, newRotation);
-      if (validShapePlace(newShape, currX, currY)) {
+      if (validShapePlace(currPiece, newRotation, currX, currY)) {
         currRotation = newRotation;
       }
       keysHold['rot_180'] = true;
@@ -432,14 +576,14 @@ function gameLoop() {
 
   // draw ghost piece placement
   let ghostY = currY;
-  while (validShapePlace(currShape, currX, ghostY + 1)) {
+  while (validShapePlace(currPiece, currRotation, currX, ghostY + 1)) {
     ghostY++;
   }
-  for (let i = 0; i < currPiece.shape.length; i++) {
-    const [px, py] = currShape[i];
-    if (currY + py < playHeight) {
-      playGrid[ghostY + py][currX + px].col = COLOR_GHOST;
-    }
+  for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
+    const [px, py] = currPiece.shapes[currRotation][i];
+    playGrid[ghostY - currPiece.centerY + py][
+      currX - currPiece.centerX + px
+    ].col = COLOR_GHOST;
   }
 
   // gravity
@@ -453,13 +597,15 @@ function gameLoop() {
   }
   if (gravityCounter >= tempGravityInterval) {
     gravityCounter = 0;
-    if (validShapePlace(currShape, currX, currY + 1)) {
+    if (validShapePlace(currPiece, currRotation, currX, currY + 1)) {
       currY++;
     } else {
       // place piece
-      for (let i = 0; i < currPiece.shape.length; i++) {
-        const [px, py] = currShape[i];
-        playGrid[currY + py][currX + px].isPlaced = true;
+      for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
+        const [px, py] = currPiece.shapes[currRotation][i];
+        playGrid[currY - currPiece.centerY + py][
+          currX - currPiece.centerX + px
+        ].isPlaced = true;
       }
       reset = true;
     }
@@ -471,9 +617,11 @@ function gameLoop() {
       keysHold['harddrop'] = true;
       currY = ghostY;
       // place piece
-      for (let i = 0; i < currPiece.shape.length; i++) {
-        const [px, py] = currShape[i];
-        playGrid[currY + py][currX + px].isPlaced = true;
+      for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
+        const [px, py] = currPiece.shapes[currRotation][i];
+        playGrid[currY - currPiece.centerY + py][
+          currX - currPiece.centerX + px
+        ].isPlaced = true;
       }
       reset = true;
     }
@@ -483,10 +631,11 @@ function gameLoop() {
   }
 
   // draw piece
-  for (let i = 0; i < currPiece.shape.length; i++) {
-    const [px, py] = currShape[i];
-
-    playGrid[currY + py][currX + px].col = currPiece.color;
+  for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
+    const [px, py] = currPiece.shapes[currRotation][i];
+    playGrid[currY - currPiece.centerY + py][
+      currX - currPiece.centerX + px
+    ].col = currPiece.color;
   }
 
   if (reset) {
@@ -552,18 +701,21 @@ function gameLoop() {
 
   // update holdGrid
   if (holdPiece) {
-    holdPiece.shape.forEach((pos) => {
+    holdPiece.shapes[0].forEach((pos) => {
       const [x, y] = pos;
-      holdGrid[2 + y][1 + x].col = holdPiece.color;
+      holdGrid[2 + y - holdPiece.centerY][1 + x - holdPiece.centerX].col =
+        holdPiece.color;
     });
   }
 
   // update nextGrid
   for (let i = 0; i < 5; i++) {
     const showPiece = bag[bag.length - 1 - i];
-    showPiece.shape.forEach((pos) => {
+    showPiece.shapes[0].forEach((pos) => {
       const [x, y] = pos;
-      nextGrid[i * 4 + 2 + y][1 + x].col = showPiece.color;
+      nextGrid[i * 4 + 2 + y - showPiece.centerY][
+        1 + x - showPiece.centerX
+      ].col = showPiece.color;
     });
   }
   updateDOM();
