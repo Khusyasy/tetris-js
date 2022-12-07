@@ -1,5 +1,6 @@
 const gridEl = document.getElementById('grid');
 const scoreEl = document.getElementById('score');
+const linesEl = document.getElementById('lines');
 const holdEl = document.getElementById('hold');
 const nextEl = document.getElementById('next');
 
@@ -380,6 +381,7 @@ for (let i = 0; i < holdHeight; i++) {
 }
 
 let score = 0;
+let linesCleared = 0;
 function updateDOM() {
   playGrid.forEach((row, i) => {
     row.forEach((cell, j) => {
@@ -391,6 +393,7 @@ function updateDOM() {
     });
   });
   scoreEl.innerText = `Score: ${score}`;
+  linesEl.innerText = `Lines Cleared: ${linesCleared}`;
   // show next pieces
   nextGrid.forEach((row, i) => {
     row.forEach((cell, j) => {
@@ -422,7 +425,7 @@ let canHold = true;
 let moveInterval = 7;
 let moveCounter = 0;
 
-let gravityInterval = 15;
+let gravityInterval = 23;
 let gravityCounter = 0;
 
 function resetPiece() {
@@ -483,6 +486,7 @@ function newGame() {
   holdPiece = null;
   bag = [];
   score = 0;
+  linesCleared = 0;
   clearGrid();
   newPiece();
   updateDOM();
@@ -587,11 +591,17 @@ function gameLoop() {
   // gravity
   gravityCounter++;
   let reset = false;
-  let tempGravityInterval = gravityInterval;
+  let scaledGravityInterval =
+    gravityInterval - Math.floor(linesCleared / 10) * 2;
+  if (scaledGravityInterval < 1) {
+    scaledGravityInterval = 1;
+  }
+
+  let tempGravityInterval = scaledGravityInterval;
   if (currY == ghostY) {
-    tempGravityInterval = gravityInterval * 4;
+    tempGravityInterval = scaledGravityInterval * 4;
   } else if (getInput('softdrop')) {
-    tempGravityInterval = gravityInterval / 4;
+    tempGravityInterval = scaledGravityInterval / 4;
   }
   if (gravityCounter >= tempGravityInterval) {
     gravityCounter = 0;
@@ -666,6 +676,7 @@ function gameLoop() {
       }
     }
     // check for continuous full rows
+    linesCleared += fullRows.length;
     if (fullRows.length == 1) {
       score += 100;
     } else if (fullRows.length == 2) {
