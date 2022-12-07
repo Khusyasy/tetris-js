@@ -1,7 +1,7 @@
 :root {
   font-size: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  --cell-size: 2rem;
+  --cell-size: 1.75rem;
 }
 
 * {
@@ -27,10 +27,10 @@ body {
 
 .grid {
   width: calc((var(--cell-size) * 10));
-  height: calc((var(--cell-size) * 20));
+  height: calc((var(--cell-size) * 23));
   display: grid;
   grid-template-columns: repeat(10, 1fr);
-  grid-template-rows: repeat(20, 1fr);
+  grid-template-rows: repeat(23, 1fr);
   background-color: #e0e0e0;
   margin: 1rem;
   border: 1px solid black;

@@ -342,7 +342,7 @@ class GridCell {
 
 const playGrid = [];
 const playWidth = 10;
-const playHeight = 20;
+const playHeight = 23;
 for (let i = 0; i < playHeight; i++) {
   playGrid.push([]);
   for (let j = 0; j < playWidth; j++) {
