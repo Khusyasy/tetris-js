@@ -296,7 +296,7 @@ function newPiece() {
       const j = Math.floor(Math.random() * (i + 1));
       [temp[i], temp[j]] = [temp[j], temp[i]];
     }
-    bag.push(...temp);
+    bag.unshift(...temp);
   }
   resetPiece();
   currPiece = bag.pop();
