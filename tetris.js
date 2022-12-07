@@ -477,22 +477,6 @@ function clearGrid() {
   });
 }
 
-function newGame() {
-  playGrid.forEach((row) => {
-    row.forEach((cell) => {
-      cell.clear();
-    });
-  });
-  holdPiece = null;
-  bag = [];
-  score = 0;
-  linesCleared = 0;
-  clearGrid();
-  newPiece();
-  updateDOM();
-}
-newGame();
-
 function validShapePlace(piece, rotation, x, y) {
   x = x - piece.centerX;
   y = y - piece.centerY;
@@ -736,16 +720,49 @@ function gameLoop() {
   prevKeysDown = JSON.parse(JSON.stringify(keysDown));
 }
 
+function newGame() {
+  playGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.clear();
+    });
+  });
+  holdPiece = null;
+  bag = [];
+  score = 0;
+  linesCleared = 0;
+  clearGrid();
+  newPiece();
+  updateDOM();
+  lastTime = performance.now();
+  gameLoop();
+}
+newGame();
+
 let playing = false;
+let countdownInterval = null;
+let countdown = 3;
 startBtn.addEventListener('click', () => {
   if (!playing) {
     playing = true;
-    startBtn.innerText = 'Pause';
-    gameInterval = setInterval(gameLoop, 1000 / 240);
+    countdown = 3;
+    clearInterval(countdownInterval);
+    const countdownFunc = () => {
+      if (countdown > 0) {
+        startBtn.innerText = countdown;
+        countdown--;
+      } else {
+        startBtn.innerText = 'Pause';
+        gameInterval = setInterval(gameLoop, 1000 / 240);
+        clearInterval(countdownInterval);
+      }
+    };
+    countdownFunc();
+    countdownInterval = setInterval(countdownFunc, 1000);
   } else {
     playing = false;
     startBtn.innerText = 'Start';
     clearInterval(gameInterval);
+    clearInterval(countdownInterval);
   }
   startBtn.blur();
 });
