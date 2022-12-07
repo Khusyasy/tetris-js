@@ -28,10 +28,10 @@ const DEFAULT_INPUT_CONFIG = {
   rot_180: 'ArrowUp',
   hold: 'Shift',
 };
-let INPUT_CONFIG = {};
+let INPUT_CONFIG = { ...DEFAULT_INPUT_CONFIG };
 if (localStorage.getItem('INPUT_CONFIG')) {
   INPUT_CONFIG = {
-    ...DEFAULT_INPUT_CONFIG,
+    ...INPUT_CONFIG,
     ...JSON.parse(localStorage.getItem('INPUT_CONFIG')),
   };
 }
