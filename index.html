@@ -6,105 +6,35 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tetris thing</title>
-    <style>
-      :root {
-        --cell-size: 2rem;
-      }
-
-      * {
-        padding: 0;
-        margin: 0;
-        box-sizing: border-box;
-      }
-
-      .center {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .margin {
-        margin: 4px;
-      }
-
-      .grid {
-        width: calc((var(--cell-size) * 10));
-        height: calc((var(--cell-size) * 20));
-        display: grid;
-        grid-template-columns: repeat(10, 1fr);
-        grid-template-rows: repeat(20, 1fr);
-        background-color: #e0e0e0;
-        border: 1px solid black;
-      }
-
-      .cell {
-        width: calc(var(--cell-size));
-        height: calc(var(--cell-size));
-        display: inline-block;
-        background-color: var(--cell-color);
-        border: 1px solid var(--cell-color, #bfbfbf);
-      }
-
-      .hold {
-        --cell-size: 1rem;
-        width: calc((var(--cell-size) * 4));
-        height: calc((var(--cell-size) * 4));
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(4, 1fr);
-        background-color: #e0e0e0;
-        border: 1px solid black;
-      }
-
-      .next {
-        --cell-size: 1rem;
-        width: calc((var(--cell-size) * 4));
-        height: calc((var(--cell-size) * 20));
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-template-rows: repeat(20, 1fr);
-        background-color: #e0e0e0;
-        border: 1px solid black;
-      }
-
-      .keybinds-modal {
-        display: block;
-      }
-
-      .hidden {
-        display: none;
-      }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
   </head>
 
   <body>
+    <div>
+      <h2 id="score"></h2>
+    </div>
     <div class="center">
-      <div id="grid" class="grid margin">
-      </div>
-      <div class="margin">
+      <div id="grid" class="grid"></div>
+      <div class="side-info">
         <div>
           <p>Hold</p>
           <div id="hold" class="hold">
           </div>
-          </div>
-          <div>
+        </div>
+        <div>
           <p>Next</p>
           <div id="next" class="next">
           </div>
         </div>
       </div>
     </div>
-    <div class="center">
-      <div id="score"></div>
+    <div class="btn-container">
+      <button class="btn" id="start">Start</button>
+      <button class="btn" id="reset">Reset</button>
+      <button class="btn" id="keybinds">Custom Keybinds</button>
+      <button class="btn" id="custom-keybinds">Use Custom Keybinds</button>
     </div>
     <div class="center">
-      <button id="start">Start</button>
-      <button id="reset">Reset</button>
-      <button id="keybinds">Custom Keybinds</button>
-      <button id="custom-keybinds">Use Custom Keybinds</button>
-      </div>
-      <div class="center">
         <div id="keybinds-modal" class="keybinds-modal hidden"></div>
     </div>
     <script src="tetris.js"></script>
