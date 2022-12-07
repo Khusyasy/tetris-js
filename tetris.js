@@ -18,17 +18,19 @@ document.addEventListener('keyup', (e) => {
 });
 
 // read from local storage
-let INPUT_CONFIG = null;
+let INPUT_CONFIG = {
+  mv_left: 'a',
+  mv_right: 'd',
+  softdrop: 's',
+  rot_ccw: 'ArrowLeft',
+  rot_cw: 'ArrowRight',
+  rot_180: 'ArrowUp',
+  hold: 'Shift',
+};
 if (localStorage.getItem('INPUT_CONFIG')) {
-  INPUT_CONFIG = JSON.parse(localStorage.getItem('INPUT_CONFIG'));
-} else {
   INPUT_CONFIG = {
-    mv_left: 'a',
-    mv_right: 'd',
-    softdrop: 's',
-    rot_ccw: 'ArrowLeft',
-    rot_cw: 'ArrowRight',
-    hold: 'Shift',
+    ...INPUT_CONFIG,
+    ...JSON.parse(localStorage.getItem('INPUT_CONFIG')),
   };
 }
 
@@ -344,6 +346,9 @@ function gameLoop() {
   if (getInput('rot_cw')) {
     newRotation = (4 + (currRotation + 1)) % 4;
   }
+  if (getInput('rot_180')) {
+    newRotation = (4 + (currRotation + 2)) % 4;
+  }
   if (newRotation != currRotation) {
     const newShape = rotate(currPiece.shape, newRotation);
     for (let i = 0; i < currPiece.shape.length; i++) {
@@ -364,7 +369,7 @@ function gameLoop() {
     }
     rotateHold = true;
   }
-  if (!getInput('rot_ccw') && !getInput('rot_cw')) {
+  if (!getInput('rot_ccw') && !getInput('rot_cw') && !getInput('rot_180')) {
     rotateHold = false;
   }
 
