@@ -335,6 +335,7 @@ function newGame() {
   });
   holdPiece = null;
   bag = [];
+  score = 0;
   clearGrid();
   newPiece();
   updateDOM();
