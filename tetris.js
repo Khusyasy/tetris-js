@@ -5,6 +5,8 @@ const nextEl = document.getElementById('next');
 
 const startBtn = document.getElementById('start');
 const resetBtn = document.getElementById('reset');
+const keybindsBtn = document.getElementById('keybinds');
+const keybindsModal = document.getElementById('keybinds-modal');
 
 const keysDown = {};
 let prevKeysDown = {};
@@ -17,8 +19,8 @@ document.addEventListener('keyup', (e) => {
 
 // read from local storage
 let INPUT_CONFIG = null;
-if (localStorage.getItem('tetris-config')) {
-  INPUT_CONFIG = JSON.parse(localStorage.getItem('tetris-config'));
+if (localStorage.getItem('INPUT_CONFIG')) {
+  INPUT_CONFIG = JSON.parse(localStorage.getItem('INPUT_CONFIG'));
 } else {
   INPUT_CONFIG = {
     mv_left: 'a',
@@ -509,4 +511,62 @@ resetBtn.addEventListener('click', () => {
   startBtn.innerText = 'Start';
   clearInterval(gameInterval);
   resetBtn.blur();
+});
+
+Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
+  const divEl = document.createElement('div');
+
+  const labelEl = document.createElement('label');
+  labelEl.innerText = name;
+  labelEl.htmlFor = name;
+  divEl.appendChild(labelEl);
+
+  const inputEl = document.createElement('input');
+  inputEl.type = 'text';
+  inputEl.value = value;
+  inputEl.id = name;
+  inputEl.disabled = true;
+  divEl.appendChild(inputEl);
+
+  const editBtn = document.createElement('button');
+  editBtn.innerText = 'Change';
+  let editing = false;
+  function changeKey(e) {
+    // check duplicate
+    for (let [inName, inValue] of Object.entries(INPUT_CONFIG)) {
+      if (inName != name && inValue == e.key) {
+        alert('Key already in use');
+        return;
+      }
+    }
+    if (e.key != 'Escape') {
+      inputEl.value = e.key;
+      INPUT_CONFIG[name] = e.key;
+      localStorage.setItem('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
+      document.removeEventListener('keydown', changeKey);
+    }
+    editing = false;
+    editBtn.innerText = 'Change';
+  }
+  editBtn.addEventListener('click', async () => {
+    if (!editing) {
+      editBtn.innerText = 'Press key';
+      document.addEventListener('keydown', changeKey);
+    } else {
+      editBtn.innerText = 'Change';
+      document.removeEventListener('keydown', changeKey);
+    }
+    editing = !editing;
+  });
+  divEl.appendChild(editBtn);
+
+  keybindsModal.appendChild(divEl);
+});
+
+keybindsBtn.addEventListener('click', () => {
+  playing = false;
+  startBtn.innerText = 'Start';
+  clearInterval(gameInterval);
+  keybindsModal.classList.toggle('hidden');
+  keybindsBtn.blur();
 });

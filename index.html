@@ -67,6 +67,14 @@
         border: 1px solid black;
       }
 
+      .keybinds-modal {
+        display: block;
+      }
+
+      .hidden {
+        display: none;
+      }
+
     </style>
   </head>
 
@@ -93,6 +101,10 @@
     <div class="center">
       <button id="start">Start</button>
       <button id="reset">Reset</button>
+      <button id="keybinds">Keybinds</button>
+      </div>
+      <div class="center">
+        <div id="keybinds-modal" class="keybinds-modal hidden"></div>
     </div>
     <script src="tetris.js"></script>
   </body>
