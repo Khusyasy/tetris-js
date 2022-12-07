@@ -574,6 +574,7 @@ resetBtn.addEventListener('click', () => {
 
 Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
   const divEl = document.createElement('div');
+  divEl.classList.add('form-group');
 
   const labelEl = document.createElement('label');
   labelEl.innerText = name;

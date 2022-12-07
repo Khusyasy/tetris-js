@@ -31,11 +31,19 @@
     <div class="btn-container">
       <button class="btn" id="start">Start</button>
       <button class="btn" id="reset">Reset</button>
-      <button class="btn" id="keybinds">Custom Keybinds</button>
-      <button class="btn" id="custom-keybinds">Use Custom Keybinds</button>
+      <label class="btn" for="keybinds">Custom Keybinds</label>
     </div>
     <div class="center">
-        <div id="keybinds-modal" class="keybinds-modal hidden"></div>
+      <input hidden type="checkbox" id="keybinds">
+      <label for="keybinds" class="modal-overlay" role="dialog">
+        <label class="keybinds-modal" aria-modal="true" aria-labelledby="modal-title" role="document">
+          <label for="keybinds" aria-label="Close modal" class="btn modal-close">x</label>
+          <div id="keybinds-modal"></div>
+          <div class="btn-container">
+            <button class="btn" id="custom-keybinds">Use Custom Keybinds</button>
+          </div>
+        </label>
+      </label>
     </div>
     <script src="tetris.js"></script>
   </body>
