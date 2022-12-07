@@ -425,10 +425,6 @@ let moveCounter = 0;
 let gravityInterval = 15;
 let gravityCounter = 0;
 
-function randInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
 function resetPiece() {
   currX = Math.floor(playWidth / 2) - 1;
   currY = 2;
@@ -583,9 +579,9 @@ function gameLoop() {
   }
   for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
     const [px, py] = currPiece.shapes[currRotation][i];
-    playGrid[ghostY - currPiece.centerY + py][
-      currX - currPiece.centerX + px
-    ].col = COLOR_GHOST;
+    const ty = ghostY - currPiece.centerY + py;
+    const tx = currX - currPiece.centerX + px;
+    playGrid[ty][tx].col = COLOR_GHOST;
   }
 
   // gravity
@@ -605,9 +601,9 @@ function gameLoop() {
       // place piece
       for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
         const [px, py] = currPiece.shapes[currRotation][i];
-        playGrid[currY - currPiece.centerY + py][
-          currX - currPiece.centerX + px
-        ].isPlaced = true;
+        const ty = currY - currPiece.centerY + py;
+        const tx = currX - currPiece.centerX + px;
+        playGrid[ty][tx].isPlaced = true;
       }
       reset = true;
     }
@@ -621,9 +617,9 @@ function gameLoop() {
       // place piece
       for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
         const [px, py] = currPiece.shapes[currRotation][i];
-        playGrid[currY - currPiece.centerY + py][
-          currX - currPiece.centerX + px
-        ].isPlaced = true;
+        const ty = currY - currPiece.centerY + py;
+        const tx = currX - currPiece.centerX + px;
+        playGrid[ty][tx].isPlaced = true;
       }
       reset = true;
     }
@@ -635,9 +631,9 @@ function gameLoop() {
   // draw piece
   for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
     const [px, py] = currPiece.shapes[currRotation][i];
-    playGrid[currY - currPiece.centerY + py][
-      currX - currPiece.centerX + px
-    ].col = currPiece.color;
+    const ty = currY - currPiece.centerY + py;
+    const tx = currX - currPiece.centerX + px;
+    playGrid[ty][tx].col = currPiece.color;
   }
 
   if (reset) {
@@ -706,8 +702,9 @@ function gameLoop() {
   if (holdPiece) {
     holdPiece.shapes[0].forEach((pos) => {
       const [x, y] = pos;
-      holdGrid[2 + y - holdPiece.centerY][1 + x - holdPiece.centerX].col =
-        canHold ? holdPiece.color : holdPiece.color + '50';
+      const ty = 2 + y - holdPiece.centerY;
+      const tx = 1 + x - holdPiece.centerX;
+      holdGrid[ty][tx].col = holdPiece.color + (canHold ? '' : +'50');
     });
   }
 
@@ -716,9 +713,9 @@ function gameLoop() {
     const showPiece = bag[bag.length - 1 - i];
     showPiece.shapes[0].forEach((pos) => {
       const [x, y] = pos;
-      nextGrid[i * 4 + 2 + y - showPiece.centerY][
-        1 + x - showPiece.centerX
-      ].col = showPiece.color;
+      const ty = i * 4 + 2 + y - showPiece.centerY;
+      const tx = 1 + x - showPiece.centerX;
+      nextGrid[ty][tx].col = showPiece.color;
     });
   }
   updateDOM();
