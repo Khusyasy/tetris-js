@@ -7,6 +7,7 @@ const startBtn = document.getElementById('start');
 const resetBtn = document.getElementById('reset');
 const keybindsBtn = document.getElementById('keybinds');
 const keybindsModal = document.getElementById('keybinds-modal');
+const customKeybindsBtn = document.getElementById('custom-keybinds');
 
 const keysDown = {};
 let prevKeysDown = {};
@@ -18,7 +19,7 @@ document.addEventListener('keyup', (e) => {
 });
 
 // read from local storage
-let INPUT_CONFIG = {
+const DEFAULT_INPUT_CONFIG = {
   mv_left: 'a',
   mv_right: 'd',
   softdrop: 's',
@@ -27,18 +28,37 @@ let INPUT_CONFIG = {
   rot_180: 'ArrowUp',
   hold: 'Shift',
 };
+let INPUT_CONFIG = {};
 if (localStorage.getItem('INPUT_CONFIG')) {
   INPUT_CONFIG = {
-    ...INPUT_CONFIG,
+    ...DEFAULT_INPUT_CONFIG,
     ...JSON.parse(localStorage.getItem('INPUT_CONFIG')),
   };
 }
 
+let USE_DEFAULT_KEYBINDS = true;
+if (localStorage.getItem('INPUT_CONFIG')) {
+  USE_DEFAULT_KEYBINDS =
+    localStorage.getItem('USE_DEFAULT_KEYBINDS') === 'true';
+}
+if (USE_DEFAULT_KEYBINDS) {
+  customKeybindsBtn.innerText = 'Keybinds: Default';
+} else {
+  customKeybindsBtn.innerText = 'Keybinds: Custom';
+}
+
 function getInput(key, prev = false) {
-  if (prev) {
-    return prevKeysDown[INPUT_CONFIG[key]];
+  if (USE_DEFAULT_KEYBINDS) {
+    if (prev) {
+      return prevKeysDown[DEFAULT_INPUT_CONFIG[key]];
+    }
+    return keysDown[DEFAULT_INPUT_CONFIG[key]];
+  } else {
+    if (prev) {
+      return prevKeysDown[INPUT_CONFIG[key]];
+    }
+    return keysDown[INPUT_CONFIG[key]];
   }
-  return keysDown[INPUT_CONFIG[key]];
 }
 
 const pieces = [
@@ -574,4 +594,14 @@ keybindsBtn.addEventListener('click', () => {
   clearInterval(gameInterval);
   keybindsModal.classList.toggle('hidden');
   keybindsBtn.blur();
+});
+
+customKeybindsBtn.addEventListener('click', () => {
+  USE_DEFAULT_KEYBINDS = !USE_DEFAULT_KEYBINDS;
+  localStorage.setItem('useDefaultKeybinds', USE_DEFAULT_KEYBINDS);
+  if (USE_DEFAULT_KEYBINDS) {
+    customKeybindsBtn.innerText = 'Keybinds: Default';
+  } else {
+    customKeybindsBtn.innerText = 'Keybinds: Custom';
+  }
 });
