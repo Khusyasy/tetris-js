@@ -98,7 +98,10 @@ function getInput(key, prev = false) {
   }
 }
 
-const pieces = [
+// GAME LOOKUP TABLES
+
+// PIECES_TABLE
+const PIECES_TABLE = [
   {
     name: 'I',
     color: '#00ffff',
@@ -325,6 +328,141 @@ const pieces = [
   },
 ];
 
+// KICK_TABLE[currentRotation][nextRotation]
+const KICK_TABLE = {
+  0: {
+    1: [
+      [0, 0],
+      [-1, 0],
+      [-1, 1],
+      [0, -2],
+      [-1, -2],
+    ],
+    3: [
+      [0, 0],
+      [1, 0],
+      [1, -1],
+      [0, -2],
+      [1, -2],
+    ],
+  },
+  1: {
+    0: [
+      [0, 0],
+      [1, 0],
+      [1, -1],
+      [0, 2],
+      [1, 2],
+    ],
+    2: [
+      [0, 0],
+      [1, 0],
+      [1, -1],
+      [0, 2],
+      [1, 2],
+    ],
+  },
+  2: {
+    1: [
+      [0, 0],
+      [-1, 0],
+      [-1, 1],
+      [0, -2],
+      [-1, -2],
+    ],
+    3: [
+      [0, 0],
+      [1, 0],
+      [1, 1],
+      [0, -2],
+      [1, -2],
+    ],
+  },
+  3: {
+    0: [
+      [0, 0],
+      [-1, 0],
+      [-1, -1],
+      [0, 2],
+      [-1, 2],
+    ],
+    2: [
+      [0, 0],
+      [-1, 0],
+      [-1, -1],
+      [0, 2],
+      [-1, 2],
+    ],
+  },
+};
+
+const KICK_TABLE_I = {
+  0: {
+    1: [
+      [0, 0],
+      [-2, 0],
+      [1, 0],
+      [-2, -1],
+      [1, 2],
+    ],
+    3: [
+      [0, 0],
+      [-1, 0],
+      [2, 0],
+      [-1, 2],
+      [2, -1],
+    ],
+  },
+  1: {
+    0: [
+      [0, 0],
+      [2, 0],
+      [-1, 0],
+      [2, 1],
+      [-1, -2],
+    ],
+    2: [
+      [0, 0],
+      [-1, 0],
+      [2, 0],
+      [-1, 2],
+      [2, -1],
+    ],
+  },
+  2: {
+    1: [
+      [0, 0],
+      [1, 0],
+      [-2, 0],
+      [1, -2],
+      [-2, 1],
+    ],
+    3: [
+      [0, 0],
+      [2, 0],
+      [-1, 0],
+      [2, 1],
+      [-1, -2],
+    ],
+  },
+  3: {
+    0: [
+      [0, 0],
+      [-2, 0],
+      [1, 0],
+      [-2, -1],
+      [1, 2],
+    ],
+    2: [
+      [0, 0],
+      [1, 0],
+      [-2, 0],
+      [1, -2],
+      [-2, 1],
+    ],
+  },
+};
+
 const COLOR_BLANK = '#00000000';
 const COLOR_GHOST = '#33333340';
 
@@ -437,7 +575,7 @@ function resetPiece() {
 let bag = [];
 function newPiece() {
   while (bag.length <= 7) {
-    let temp = [...pieces];
+    let temp = [...PIECES_TABLE];
     for (let i = temp.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [temp[i], temp[j]] = [temp[j], temp[i]];
@@ -529,11 +667,17 @@ function gameLoop() {
 
   // rotate
   let newRotation = currRotation;
+  const KICK_TABLE_USED = currPiece.name == 'I' ? KICK_TABLE_I : KICK_TABLE;
   if (getInput('rot_ccw')) {
     newRotation = (4 + (currRotation - 1)) % 4;
     if (newRotation != currRotation && !keysHold['rot_ccw']) {
-      if (validShapePlace(currPiece, newRotation, currX, currY)) {
-        currRotation = newRotation;
+      for (const [kx, ky] of KICK_TABLE_USED[currRotation][newRotation]) {
+        if (validShapePlace(currPiece, newRotation, currX + kx, currY + ky)) {
+          currRotation = newRotation;
+          currX += kx;
+          currY += ky;
+          break;
+        }
       }
       keysHold['rot_ccw'] = true;
     }
@@ -543,8 +687,13 @@ function gameLoop() {
   if (getInput('rot_cw')) {
     newRotation = (4 + (currRotation + 1)) % 4;
     if (newRotation != currRotation && !keysHold['rot_cw']) {
-      if (validShapePlace(currPiece, newRotation, currX, currY)) {
-        currRotation = newRotation;
+      for (const [kx, ky] of KICK_TABLE_USED[currRotation][newRotation]) {
+        if (validShapePlace(currPiece, newRotation, currX + kx, currY + ky)) {
+          currRotation = newRotation;
+          currX += kx;
+          currY += ky;
+          break;
+        }
       }
       keysHold['rot_cw'] = true;
     }
@@ -740,11 +889,11 @@ newGame();
 
 let playing = false;
 let countdownInterval = null;
-let countdown = 3;
+let countdown = 1;
 startBtn.addEventListener('click', () => {
   if (!playing) {
     playing = true;
-    countdown = 3;
+    countdown = 1;
     clearInterval(countdownInterval);
     const countdownFunc = () => {
       if (countdown > 0) {
