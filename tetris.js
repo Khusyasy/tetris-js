@@ -338,6 +338,24 @@ function newGame() {
 }
 newGame();
 
+function validShapePlace(shape, x, y) {
+  for (let i = 0; i < shape.length; i++) {
+    const [px, py] = shape[i];
+    if (
+      x + px < 0 ||
+      x + px >= playWidth ||
+      y + py < 0 ||
+      y + py >= playHeight
+    ) {
+      return false;
+    }
+    if (playGrid[y + py][x + px].isPlaced) {
+      return false;
+    }
+  }
+  return true;
+}
+
 let gameInterval = null;
 function gameLoop() {
   const currShape = rotate(currPiece.shape, currRotation);
@@ -346,36 +364,12 @@ function gameLoop() {
   // move
   let dx = 0;
   if (getInput('mv_left')) {
-    let canMove = true;
-    for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = currShape[i];
-      if (currX + px - 1 < 0) {
-        canMove = false;
-        break;
-      }
-      if (playGrid[currY + py][currX + px - 1].isPlaced) {
-        canMove = false;
-        break;
-      }
-    }
-    if (canMove) {
+    if (validShapePlace(currShape, currX - 1, currY)) {
       dx = -1;
     }
   }
   if (getInput('mv_right')) {
-    let canMove = true;
-    for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = currShape[i];
-      if (currX + px + 1 >= playWidth) {
-        canMove = false;
-        break;
-      }
-      if (playGrid[currY + py][currX + px + 1].isPlaced) {
-        canMove = false;
-        break;
-      }
-    }
-    if (canMove) {
+    if (validShapePlace(currShape, currX + 1, currY)) {
       dx = 1;
     }
   }
@@ -391,7 +385,6 @@ function gameLoop() {
   }
 
   // rotate
-  let canRotate = true;
   let newRotation = currRotation;
   if (getInput('rot_ccw')) {
     newRotation = (4 + (currRotation - 1)) % 4;
@@ -402,22 +395,9 @@ function gameLoop() {
   if (getInput('rot_180')) {
     newRotation = (4 + (currRotation + 2)) % 4;
   }
-  if (newRotation != currRotation) {
+  if (newRotation != currRotation && !rotateHold) {
     const newShape = rotate(currPiece.shape, newRotation);
-    for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = newShape[i];
-      if (currX + px < 0 || currX + px >= playWidth) {
-        canRotate = false;
-        break;
-      }
-      if (playGrid[currY + py][currX + px].isPlaced) {
-        canRotate = false;
-        break;
-      }
-    }
-  }
-  if (!rotateHold) {
-    if (canRotate) {
+    if (validShapePlace(newShape, currX, currY)) {
       currRotation = newRotation;
     }
     rotateHold = true;
@@ -435,20 +415,7 @@ function gameLoop() {
   }
   if (gravityCounter >= tempGravityInterval) {
     gravityCounter = 0;
-    // check collision
-    let canMove = true;
-    for (let i = 0; i < currPiece.shape.length; i++) {
-      const [px, py] = currShape[i];
-      if (currY + py + 1 >= playHeight) {
-        canMove = false;
-        break;
-      } else if (playGrid[currY + py + 1][currX + px].isPlaced) {
-        canMove = false;
-        break;
-      }
-    }
-
-    if (canMove) {
+    if (validShapePlace(currShape, currX, currY + 1)) {
       currY++;
     } else {
       // place piece
