@@ -47,14 +47,14 @@ body {
 .side-info {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   margin: 1rem;
-  gap: 1rem;
+  height: calc((var(--cell-size) * 20));
 }
 
 .hold {
-  --cell-size: 1rem;
+  --cell-size: 1.5rem;
   width: calc((var(--cell-size) * 4));
   height: calc((var(--cell-size) * 4));
   display: grid;
@@ -65,7 +65,7 @@ body {
 }
 
 .next {
-  --cell-size: 1rem;
+  --cell-size: 1.5rem;
   width: calc((var(--cell-size) * 4));
   height: calc((var(--cell-size) * 20));
   display: grid;
