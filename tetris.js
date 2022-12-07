@@ -54,7 +54,8 @@ function storageSet(key, value) {
 const DEFAULT_INPUT_CONFIG = {
   mv_left: 'a',
   mv_right: 'd',
-  softdrop: 's',
+  softdrop: 'w',
+  harddrop: 's',
   rot_ccw: 'ArrowLeft',
   rot_cw: 'ArrowRight',
   rot_180: 'ArrowUp',
@@ -180,6 +181,7 @@ function rotate(shape, rotation) {
 }
 
 const COLOR_BLANK = '#00000000';
+const COLOR_GHOST = '#33333340';
 
 class GridCell {
   constructor(col, htmlEl, isPlaced = false) {
@@ -277,6 +279,7 @@ let moveInterval = 7;
 let moveCounter = 0;
 
 let rotateHold = false;
+let harddropHold = false;
 
 let gravityInterval = 15;
 let gravityCounter = 0;
@@ -421,14 +424,42 @@ function gameLoop() {
       // place piece
       for (let i = 0; i < currPiece.shape.length; i++) {
         const [px, py] = currShape[i];
-        if (currY + py < playHeight) {
-          playGrid[currY + py][currX + px].isPlaced = true;
-        }
+        playGrid[currY + py][currX + px].isPlaced = true;
       }
       reset = true;
     }
   }
-  // draw
+
+  // draw ghost piece placement
+  let ghostY = currY;
+  while (validShapePlace(currShape, currX, ghostY + 1)) {
+    ghostY++;
+  }
+  for (let i = 0; i < currPiece.shape.length; i++) {
+    const [px, py] = currShape[i];
+    if (currY + py < playHeight) {
+      playGrid[ghostY + py][currX + px].col = COLOR_GHOST;
+    }
+  }
+
+  // harddrop
+  if (!harddropHold) {
+    if (getInput('harddrop')) {
+      harddropHold = true;
+      currY = ghostY;
+      // place piece
+      for (let i = 0; i < currPiece.shape.length; i++) {
+        const [px, py] = currShape[i];
+        playGrid[currY + py][currX + px].isPlaced = true;
+      }
+      reset = true;
+    }
+  }
+  if (!getInput('harddrop')) {
+    harddropHold = false;
+  }
+
+  // draw piece
   for (let i = 0; i < currPiece.shape.length; i++) {
     const [px, py] = currShape[i];
 
