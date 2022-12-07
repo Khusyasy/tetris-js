@@ -430,11 +430,25 @@ function gameLoop() {
     keysHold['rot_180'] = false;
   }
 
+  // draw ghost piece placement
+  let ghostY = currY;
+  while (validShapePlace(currShape, currX, ghostY + 1)) {
+    ghostY++;
+  }
+  for (let i = 0; i < currPiece.shape.length; i++) {
+    const [px, py] = currShape[i];
+    if (currY + py < playHeight) {
+      playGrid[ghostY + py][currX + px].col = COLOR_GHOST;
+    }
+  }
+
   // gravity
   gravityCounter++;
   let reset = false;
   let tempGravityInterval = gravityInterval;
-  if (getInput('softdrop')) {
+  if (currY == ghostY) {
+    tempGravityInterval = gravityInterval * 4;
+  } else if (getInput('softdrop')) {
     tempGravityInterval = gravityInterval / 4;
   }
   if (gravityCounter >= tempGravityInterval) {
@@ -448,18 +462,6 @@ function gameLoop() {
         playGrid[currY + py][currX + px].isPlaced = true;
       }
       reset = true;
-    }
-  }
-
-  // draw ghost piece placement
-  let ghostY = currY;
-  while (validShapePlace(currShape, currX, ghostY + 1)) {
-    ghostY++;
-  }
-  for (let i = 0; i < currPiece.shape.length; i++) {
-    const [px, py] = currShape[i];
-    if (currY + py < playHeight) {
-      playGrid[ghostY + py][currX + px].col = COLOR_GHOST;
     }
   }
 
