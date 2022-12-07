@@ -422,10 +422,10 @@ let currPiece = null;
 let currRotation = 0;
 let canHold = true;
 
-let moveInterval = 7;
+let moveInterval = 120;
 let moveCounter = 0;
 
-let gravityInterval = 23;
+let gravityInterval = 200;
 let gravityCounter = 0;
 
 function resetPiece() {
@@ -514,7 +514,10 @@ function validShapePlace(piece, rotation, x, y) {
 }
 
 let gameInterval = null;
+let lastTime = performance.now();
 function gameLoop() {
+  const deltaTime = performance.now() - lastTime;
+  lastTime = performance.now();
   clearGrid();
 
   // move
@@ -530,7 +533,7 @@ function gameLoop() {
     }
   }
   if (getInput('mv_left', true) || getInput('mv_right', true)) {
-    moveCounter++;
+    moveCounter += deltaTime;
     if (moveCounter >= moveInterval) {
       moveCounter = 0;
       currX += dx;
@@ -589,12 +592,12 @@ function gameLoop() {
   }
 
   // gravity
-  gravityCounter++;
+  gravityCounter += deltaTime;
   let reset = false;
   let scaledGravityInterval =
-    gravityInterval - Math.floor(linesCleared / 10) * 2;
-  if (scaledGravityInterval < 1) {
-    scaledGravityInterval = 1;
+    gravityInterval - Math.floor(linesCleared / 10) * 20;
+  if (scaledGravityInterval < 20) {
+    scaledGravityInterval = 20;
   }
 
   let tempGravityInterval = scaledGravityInterval;
@@ -738,7 +741,7 @@ startBtn.addEventListener('click', () => {
   if (!playing) {
     playing = true;
     startBtn.innerText = 'Pause';
-    gameInterval = setInterval(gameLoop, 1000 / 60);
+    gameInterval = setInterval(gameLoop, 1000 / 240);
   } else {
     playing = false;
     startBtn.innerText = 'Start';
