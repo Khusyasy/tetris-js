@@ -417,6 +417,7 @@ let currX = 0;
 let currY = 0;
 let currPiece = null;
 let currRotation = 0;
+let canHold = true;
 
 let moveInterval = 7;
 let moveCounter = 0;
@@ -445,6 +446,7 @@ function newPiece() {
     bag.unshift(...temp);
   }
   resetPiece();
+  canHold = true;
   currPiece = bag.pop();
   if (!validShapePlace(currPiece, 0, currX, currY)) {
     startBtn.innerText = 'Game Over';
@@ -682,7 +684,7 @@ function gameLoop() {
 
   // check to swap hold piece
   if (!keysHold['hold']) {
-    if (getInput('hold')) {
+    if (getInput('hold') && canHold) {
       if (holdPiece) {
         const temp = holdPiece;
         holdPiece = currPiece;
@@ -693,6 +695,7 @@ function gameLoop() {
         newPiece();
       }
       keysHold['hold'] = true;
+      canHold = false;
     }
   }
   if (!getInput('hold')) {
@@ -704,7 +707,7 @@ function gameLoop() {
     holdPiece.shapes[0].forEach((pos) => {
       const [x, y] = pos;
       holdGrid[2 + y - holdPiece.centerY][1 + x - holdPiece.centerX].col =
-        holdPiece.color;
+        canHold ? holdPiece.color : holdPiece.color + '50';
     });
   }
 
