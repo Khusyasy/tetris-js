@@ -18,6 +18,39 @@ document.addEventListener('keyup', (e) => {
   delete keysDown[e.key];
 });
 
+function getCookie(name) {
+  var cname = name + '=';
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for (var i = 0; i < ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(cname) == 0) {
+      return c.substring(cname.length, c.length);
+    }
+  }
+  return '';
+}
+
+function setCookie(name, value, exp_days) {
+  var d = new Date();
+  d.setTime(d.getTime() + exp_days * 24 * 60 * 60 * 1000);
+  var expires = 'expires=' + d.toGMTString();
+  document.cookie = name + '=' + value + ';' + expires + ';path=/';
+}
+
+function storageGet(key) {
+  // return localStorage.getItem(key);
+  return decodeURIComponent(atob(getCookie(key)));
+}
+
+function storageSet(key, value) {
+  // localStorage.setItem(key, value);
+  setCookie(key, btoa(encodeURIComponent(value)), 365);
+}
+
 // read from local storage
 const DEFAULT_INPUT_CONFIG = {
   mv_left: 'a',
@@ -29,20 +62,19 @@ const DEFAULT_INPUT_CONFIG = {
   hold: 'Shift',
 };
 let INPUT_CONFIG = { ...DEFAULT_INPUT_CONFIG };
-if (localStorage.getItem('INPUT_CONFIG')) {
+if (storageGet('INPUT_CONFIG')) {
   INPUT_CONFIG = {
     ...INPUT_CONFIG,
-    ...JSON.parse(localStorage.getItem('INPUT_CONFIG')),
+    ...JSON.parse(storageGet('INPUT_CONFIG')),
   };
 }
-localStorage.setItem('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
+storageSet('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
 
 let USE_DEFAULT_KEYBINDS = true;
-if (localStorage.getItem('USE_DEFAULT_KEYBINDS')) {
-  USE_DEFAULT_KEYBINDS =
-    localStorage.getItem('USE_DEFAULT_KEYBINDS') === 'true';
+if (storageGet('USE_DEFAULT_KEYBINDS')) {
+  USE_DEFAULT_KEYBINDS = storageGet('USE_DEFAULT_KEYBINDS') === 'true';
 }
-localStorage.setItem('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
+storageSet('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
 if (USE_DEFAULT_KEYBINDS) {
   customKeybindsBtn.innerText = 'Keybinds: Default';
 } else {
@@ -569,7 +601,7 @@ Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
     if (e.key != 'Escape') {
       inputEl.value = e.key;
       INPUT_CONFIG[name] = e.key;
-      localStorage.setItem('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
+      storageSet('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
       document.removeEventListener('keydown', changeKey);
     }
     editing = false;
@@ -600,7 +632,7 @@ keybindsBtn.addEventListener('click', () => {
 
 customKeybindsBtn.addEventListener('click', () => {
   USE_DEFAULT_KEYBINDS = !USE_DEFAULT_KEYBINDS;
-  localStorage.setItem('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
+  storageSet('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
   if (USE_DEFAULT_KEYBINDS) {
     customKeybindsBtn.innerText = 'Keybinds: Default';
   } else {
