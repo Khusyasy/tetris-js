@@ -752,6 +752,8 @@ startBtn.addEventListener('click', () => {
         countdown--;
       } else {
         startBtn.innerText = 'Pause';
+        lastTime = performance.now();
+        gameLoop();
         gameInterval = setInterval(gameLoop, 1000 / 240);
         clearInterval(countdownInterval);
       }
