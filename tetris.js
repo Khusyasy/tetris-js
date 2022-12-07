@@ -5,7 +5,6 @@ const nextEl = document.getElementById('next');
 
 const startBtn = document.getElementById('start');
 const resetBtn = document.getElementById('reset');
-const keybindsBtn = document.getElementById('keybinds');
 const keybindsModal = document.getElementById('keybinds-modal');
 const customKeybindsBtn = document.getElementById('custom-keybinds');
 
@@ -572,6 +571,8 @@ resetBtn.addEventListener('click', () => {
   resetBtn.blur();
 });
 
+const editElements = {};
+let editActive = null;
 Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
   const divEl = document.createElement('div');
   divEl.classList.add('form-group');
@@ -583,15 +584,15 @@ Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
 
   const inputEl = document.createElement('input');
   inputEl.type = 'text';
-  inputEl.value = value;
+  inputEl.value = USE_DEFAULT_KEYBINDS ? DEFAULT_INPUT_CONFIG[name] : value;
   inputEl.id = name;
   inputEl.disabled = true;
   divEl.appendChild(inputEl);
 
   const editBtn = document.createElement('button');
   editBtn.innerText = 'Change';
-  let editing = false;
   function changeKey(e) {
+    editActive = name;
     // check duplicate
     for (let [inName, inValue] of Object.entries(INPUT_CONFIG)) {
       if (inName != name && inValue == e.key) {
@@ -605,30 +606,27 @@ Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
       storageSet('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
       document.removeEventListener('keydown', changeKey);
     }
-    editing = false;
+    editActive = null;
     editBtn.innerText = 'Change';
   }
   editBtn.addEventListener('click', async () => {
-    if (!editing) {
+    if (editActive == null) {
       editBtn.innerText = 'Press key';
       document.addEventListener('keydown', changeKey);
-    } else {
+      editActive = name;
+    } else if (editActive == name) {
       editBtn.innerText = 'Change';
       document.removeEventListener('keydown', changeKey);
+      editActive = null;
     }
-    editing = !editing;
   });
   divEl.appendChild(editBtn);
 
   keybindsModal.appendChild(divEl);
-});
-
-keybindsBtn.addEventListener('click', () => {
-  playing = false;
-  startBtn.innerText = 'Start';
-  clearInterval(gameInterval);
-  keybindsModal.classList.toggle('hidden');
-  keybindsBtn.blur();
+  editElements[name] = {
+    inputEl,
+    editBtn,
+  };
 });
 
 customKeybindsBtn.addEventListener('click', () => {
@@ -636,7 +634,17 @@ customKeybindsBtn.addEventListener('click', () => {
   storageSet('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
   if (USE_DEFAULT_KEYBINDS) {
     customKeybindsBtn.innerText = 'Keybinds: Default';
+    Object.entries(editElements).forEach(([name, data]) => {
+      const { inputEl, editBtn } = data;
+      inputEl.value = DEFAULT_INPUT_CONFIG[name];
+      editBtn.disabled = true;
+    });
   } else {
     customKeybindsBtn.innerText = 'Keybinds: Custom';
+    Object.entries(editElements).forEach(([name, data]) => {
+      const { inputEl, editBtn } = data;
+      inputEl.value = INPUT_CONFIG[name];
+      editBtn.disabled = false;
+    });
   }
 });

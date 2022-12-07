@@ -144,7 +144,7 @@ input:checked ~ .modal-overlay .keybinds-modal {
 }
 
 .form-group input {
-  width: 4rem;
+  width: 8rem;
   font-size: 1.25rem;
   text-align: center;
 }
