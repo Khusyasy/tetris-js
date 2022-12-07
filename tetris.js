@@ -35,12 +35,14 @@ if (localStorage.getItem('INPUT_CONFIG')) {
     ...JSON.parse(localStorage.getItem('INPUT_CONFIG')),
   };
 }
+localStorage.setItem('INPUT_CONFIG', JSON.stringify(INPUT_CONFIG));
 
 let USE_DEFAULT_KEYBINDS = true;
-if (localStorage.getItem('INPUT_CONFIG')) {
+if (localStorage.getItem('USE_DEFAULT_KEYBINDS')) {
   USE_DEFAULT_KEYBINDS =
     localStorage.getItem('USE_DEFAULT_KEYBINDS') === 'true';
 }
+localStorage.setItem('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
 if (USE_DEFAULT_KEYBINDS) {
   customKeybindsBtn.innerText = 'Keybinds: Default';
 } else {
@@ -598,7 +600,7 @@ keybindsBtn.addEventListener('click', () => {
 
 customKeybindsBtn.addEventListener('click', () => {
   USE_DEFAULT_KEYBINDS = !USE_DEFAULT_KEYBINDS;
-  localStorage.setItem('useDefaultKeybinds', USE_DEFAULT_KEYBINDS);
+  localStorage.setItem('USE_DEFAULT_KEYBINDS', USE_DEFAULT_KEYBINDS);
   if (USE_DEFAULT_KEYBINDS) {
     customKeybindsBtn.innerText = 'Keybinds: Default';
   } else {
