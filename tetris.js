@@ -10,6 +10,8 @@ const customKeybindsBtn = document.getElementById('custom-keybinds');
 
 const keysDown = {};
 let prevKeysDown = {};
+const keysHold = {};
+
 document.addEventListener('keydown', (e) => {
   keysDown[e.key] = true;
 });
@@ -222,7 +224,6 @@ for (let i = 0; i < nextHeight; i++) {
 }
 
 let holdPiece = null;
-let holdHold = false;
 const holdGrid = [];
 const holdWidth = 4;
 const holdHeight = 4;
@@ -277,9 +278,6 @@ let currRotation = 0;
 
 let moveInterval = 7;
 let moveCounter = 0;
-
-let rotateHold = false;
-let harddropHold = false;
 
 let gravityInterval = 15;
 let gravityCounter = 0;
@@ -397,22 +395,39 @@ function gameLoop() {
   let newRotation = currRotation;
   if (getInput('rot_ccw')) {
     newRotation = (4 + (currRotation - 1)) % 4;
+    if (newRotation != currRotation && !keysHold['rot_ccw']) {
+      const newShape = rotate(currPiece.shape, newRotation);
+      if (validShapePlace(newShape, currX, currY)) {
+        currRotation = newRotation;
+      }
+      keysHold['rot_ccw'] = true;
+    }
+  } else {
+    keysHold['rot_ccw'] = false;
   }
   if (getInput('rot_cw')) {
     newRotation = (4 + (currRotation + 1)) % 4;
+    if (newRotation != currRotation && !keysHold['rot_cw']) {
+      const newShape = rotate(currPiece.shape, newRotation);
+      if (validShapePlace(newShape, currX, currY)) {
+        currRotation = newRotation;
+      }
+      keysHold['rot_cw'] = true;
+    }
+  } else {
+    keysHold['rot_cw'] = false;
   }
   if (getInput('rot_180')) {
     newRotation = (4 + (currRotation + 2)) % 4;
-  }
-  if (newRotation != currRotation && !rotateHold) {
-    const newShape = rotate(currPiece.shape, newRotation);
-    if (validShapePlace(newShape, currX, currY)) {
-      currRotation = newRotation;
+    if (newRotation != currRotation && !keysHold['rot_180']) {
+      const newShape = rotate(currPiece.shape, newRotation);
+      if (validShapePlace(newShape, currX, currY)) {
+        currRotation = newRotation;
+      }
+      keysHold['rot_180'] = true;
     }
-    rotateHold = true;
-  }
-  if (!getInput('rot_ccw') && !getInput('rot_cw') && !getInput('rot_180')) {
-    rotateHold = false;
+  } else {
+    keysHold['rot_180'] = false;
   }
 
   // gravity
@@ -449,9 +464,9 @@ function gameLoop() {
   }
 
   // harddrop
-  if (!harddropHold) {
+  if (!keysHold['harddrop']) {
     if (getInput('harddrop')) {
-      harddropHold = true;
+      keysHold['harddrop'] = true;
       currY = ghostY;
       // place piece
       for (let i = 0; i < currPiece.shape.length; i++) {
@@ -462,7 +477,7 @@ function gameLoop() {
     }
   }
   if (!getInput('harddrop')) {
-    harddropHold = false;
+    keysHold['harddrop'] = false;
   }
 
   // draw piece
@@ -515,7 +530,7 @@ function gameLoop() {
   }
 
   // check to swap hold piece
-  if (!holdHold) {
+  if (!keysHold['hold']) {
     if (getInput('hold')) {
       if (holdPiece) {
         const temp = holdPiece;
@@ -526,11 +541,11 @@ function gameLoop() {
         holdPiece = currPiece;
         newPiece();
       }
-      holdHold = true;
+      keysHold['hold'] = true;
     }
   }
   if (!getInput('hold')) {
-    holdHold = false;
+    keysHold['hold'] = false;
   }
 
   // update holdGrid
