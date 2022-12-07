@@ -302,6 +302,11 @@ function newPiece() {
   }
   resetPiece();
   currPiece = bag.pop();
+  if (!validShapePlace(currPiece.shape, currX, currY)) {
+    startBtn.innerText = 'Game Over';
+    startBtn.disabled = true;
+    clearInterval(gameInterval);
+  }
 }
 
 function clearGrid() {
@@ -468,7 +473,6 @@ function gameLoop() {
   }
 
   if (reset) {
-    newPiece();
     // check for full rows
     const fullRows = [];
     for (let i = 0; i < playHeight; i++) {
@@ -507,6 +511,7 @@ function gameLoop() {
     } else if (fullRows.length >= 4) {
       score += 800;
     }
+    newPiece();
   }
 
   // check to swap hold piece
@@ -566,6 +571,7 @@ resetBtn.addEventListener('click', () => {
   newGame();
   playing = false;
   startBtn.innerText = 'Start';
+  startBtn.disabled = false;
   clearInterval(gameInterval);
   resetBtn.blur();
 });
