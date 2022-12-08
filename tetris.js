@@ -103,14 +103,14 @@ const DEFAULT_PARAMETER = {
     min: 20,
     max: 2 * 1000,
     step: 20,
-    value: 200,
+    value: 500,
     unit: 'ms',
   },
   softdrop_mult: {
     min: 1,
-    max: 20,
+    max: 40,
     step: 1,
-    value: 4,
+    value: 6,
     unit: 'x',
   },
   ARR: {
