@@ -6,8 +6,12 @@ const nextEl = document.getElementById('next');
 
 const startBtn = document.getElementById('start');
 const resetBtn = document.getElementById('reset');
+
 const keybindsModal = document.getElementById('keybinds-modal');
 const customKeybindsBtn = document.getElementById('custom-keybinds');
+
+const parameterModal = document.getElementById('parameter-modal');
+const resetParameterBtn = document.getElementById('reset-parameter');
 
 const keysDown = {};
 let prevKeysDown = {};
@@ -83,6 +87,46 @@ if (USE_DEFAULT_KEYBINDS) {
 } else {
   customKeybindsBtn.innerText = 'Keybinds: Custom';
 }
+
+// read from local storage
+const DEFAULT_PARAMETER = {
+  FPS: {
+    min: 10,
+    max: 300,
+    step: 10,
+    value: 240,
+    unit: 'fps',
+  },
+  gravity_interval: {
+    min: 10,
+    max: 1000,
+    step: 10,
+    value: 200,
+    unit: 'ms',
+  },
+  softdrop_mult: {
+    min: 1,
+    max: 10,
+    step: 1,
+    value: 4,
+    unit: 'x',
+  },
+  move_repeat: {
+    min: 10,
+    max: 1000,
+    step: 10,
+    value: 120,
+    unit: 'ms',
+  },
+};
+let PARAMETER = { ...DEFAULT_PARAMETER };
+if (storageGet('PARAMETER')) {
+  PARAMETER = {
+    ...PARAMETER,
+    ...JSON.parse(storageGet('PARAMETER')),
+  };
+}
+storageSet('PARAMETER', JSON.stringify(PARAMETER));
 
 function getInput(key, prev = false) {
   if (USE_DEFAULT_KEYBINDS) {
@@ -1003,4 +1047,62 @@ customKeybindsBtn.addEventListener('click', () => {
       editBtn.disabled = false;
     });
   }
+});
+
+const parameterElements = {};
+Object.entries(PARAMETER).forEach(([name, data]) => {
+  const divEl = document.createElement('div');
+  divEl.classList.add('form-group');
+
+  const labelEl = document.createElement('label');
+  labelEl.innerText = name;
+  labelEl.htmlFor = name;
+  divEl.appendChild(labelEl);
+
+  const conEl = document.createElement('div');
+  conEl.classList.add('parameter-info');
+
+  const valueEl = document.createElement('p');
+  valueEl.innerText = data.value;
+  valueEl.htmlFor = name;
+
+  const unitEl = document.createElement('p');
+  unitEl.innerText = data.unit;
+  unitEl.htmlFor = name;
+
+  conEl.appendChild(valueEl);
+  conEl.appendChild(unitEl);
+
+  const inputEl = document.createElement('input');
+  inputEl.type = 'range';
+  inputEl.min = data.min;
+  inputEl.max = data.max;
+  inputEl.step = data.step;
+  inputEl.value = data.value;
+  inputEl.id = name;
+  inputEl.addEventListener('input', () => {
+    PARAMETER[name].value = inputEl.value;
+    valueEl.innerText = inputEl.value;
+    storageSet('PARAMETER', JSON.stringify(PARAMETER));
+  });
+
+  divEl.appendChild(inputEl);
+  divEl.appendChild(conEl);
+
+  parameterModal.appendChild(divEl);
+  parameterElements[name] = {
+    inputEl,
+    valueEl,
+  };
+});
+
+resetParameterBtn.addEventListener('click', () => {
+  PARAMETER = JSON.parse(JSON.stringify(DEFAULT_PARAMETER));
+  storageSet('PARAMETER', JSON.stringify(PARAMETER));
+  Object.entries(PARAMETER).forEach(([name, data]) => {
+    const { inputEl, valueEl } = parameterElements[name];
+    inputEl.value = data.value;
+    valueEl.innerText = data.value;
+  });
+  resetParameterBtn.blur();
 });

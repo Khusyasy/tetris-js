@@ -29,15 +29,28 @@
       <button class="btn" id="start">Start</button>
       <button class="btn" id="reset">Reset</button>
       <label class="btn" for="keybinds">Custom Keybinds</label>
+      <label class="btn" for="parameter">Custom Parameter</label>
     </div>
-    <div class="center">
+    <div>
       <input hidden type="checkbox" id="keybinds">
       <label for="keybinds" class="modal-overlay" role="dialog">
-        <label class="keybinds-modal" aria-modal="true" aria-labelledby="modal-title" role="document">
+        <label class="modal-body" aria-modal="true" aria-labelledby="modal-title" role="document">
           <label for="keybinds" aria-label="Close modal" class="btn modal-close">x</label>
           <div id="keybinds-modal"></div>
           <div class="btn-container">
             <button class="btn" id="custom-keybinds">Use Custom Keybinds</button>
+          </div>
+        </label>
+      </label>
+    </div>
+    <div>
+      <input hidden type="checkbox" id="parameter">
+      <label for="parameter" class="modal-overlay" role="dialog">
+        <label class="modal-body" aria-modal="true" aria-labelledby="modal-title" role="document">
+          <label for="parameter" aria-label="Close modal" class="btn modal-close">x</label>
+          <div id="parameter-modal"></div>
+          <div class="btn-container">
+            <button class="btn" id="reset-parameter">Reset Parameter</button>
           </div>
         </label>
       </label>

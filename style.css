@@ -109,7 +109,7 @@ body {
   right: 0.5rem;
 }
 
-.keybinds-modal {
+.modal-body {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -124,7 +124,7 @@ input:checked ~ .modal-overlay {
   opacity: 1;
   pointer-events: auto;
 }
-input:checked ~ .modal-overlay .keybinds-modal {
+input:checked ~ .modal-overlay .modal-body {
   transform: translate(-50%, -50%);
 }
 
@@ -157,4 +157,10 @@ input:checked ~ .modal-overlay .keybinds-modal {
   border: 1px solid black;
   border-radius: 0.25rem;
   cursor: pointer;
+}
+
+.parameter-info {
+  display: flex;
+  gap: 0.25rem;
+  min-width: 6rem;
 }
