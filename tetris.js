@@ -94,29 +94,29 @@ if (USE_DEFAULT_KEYBINDS) {
 const DEFAULT_PARAMETER = {
   FPS: {
     min: 10,
-    max: 300,
+    max: 1000,
     step: 10,
     value: 240,
     unit: 'fps',
   },
   gravity_interval: {
-    min: 10,
-    max: 1000,
-    step: 10,
+    min: 20,
+    max: 2 * 1000,
+    step: 20,
     value: 200,
     unit: 'ms',
   },
   softdrop_mult: {
     min: 1,
-    max: 10,
+    max: 20,
     step: 1,
     value: 4,
     unit: 'x',
   },
   move_repeat: {
     min: 10,
-    max: 1000,
-    step: 10,
+    max: 500,
+    step: 5,
     value: 120,
     unit: 'ms',
   },
@@ -783,7 +783,6 @@ function gameLoop() {
     tempGravityInterval = scaledGravityInterval / PARAMETER.softdrop_mult.value;
   }
   if (gravityCounter >= tempGravityInterval) {
-    gravityCounter = 0;
     if (validShapePlace(currPiece, currRotation, currX, currY + 1)) {
       currY++;
     } else {
@@ -796,6 +795,7 @@ function gameLoop() {
       }
       reset = true;
     }
+    gravityCounter = 0;
   }
 
   // harddrop
