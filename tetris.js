@@ -113,11 +113,18 @@ const DEFAULT_PARAMETER = {
     value: 4,
     unit: 'x',
   },
-  move_repeat: {
+  ARR: {
     min: 10,
     max: 500,
     step: 5,
-    value: 120,
+    value: 30,
+    unit: 'ms',
+  },
+  DAS: {
+    min: 10,
+    max: 500,
+    step: 5,
+    value: 160,
     unit: 'ms',
   },
 };
@@ -607,6 +614,7 @@ let currRotation = 0;
 let canHold = true;
 
 let moveCounter = 0;
+let delayMoveCounter = 0;
 let gravityCounter = 0;
 
 function resetPiece() {
@@ -697,15 +705,23 @@ function gameLoop() {
       dx = 1;
     }
   }
-  if (getInput('mv_left', true) || getInput('mv_right', true)) {
-    moveCounter += deltaTime;
-    if (moveCounter >= PARAMETER.move_repeat.value) {
-      moveCounter = 0;
-      currX += dx;
+
+  if (dx != 0) {
+    if (delayMoveCounter <= PARAMETER.DAS.value) {
+      if (delayMoveCounter == 0) {
+        moveCounter = 0;
+        currX += dx;
+      }
+      delayMoveCounter += deltaTime;
+    } else {
+      moveCounter += deltaTime;
+      if (moveCounter >= PARAMETER.ARR.value) {
+        moveCounter = 0;
+        currX += dx;
+      }
     }
   } else {
-    moveCounter = 0;
-    currX += dx;
+    delayMoveCounter = 0;
   }
 
   // rotate
