@@ -518,7 +518,7 @@ const KICK_TABLE_I = {
 };
 
 const COLOR_BLANK = '#00000000';
-const COLOR_GHOST = '#33333340';
+const COLOR_GHOST = '#a19c9c47';
 
 class GridCell {
   constructor(col, htmlEl, isPlaced = false) {
@@ -928,7 +928,7 @@ function gameLoop() {
       const [x, y] = pos;
       const ty = 2 + y - holdPiece.centerY;
       const tx = 1 + x - holdPiece.centerX;
-      holdGrid[ty][tx].col = holdPiece.color + (canHold ? '' : +'50');
+      holdGrid[ty][tx].col = holdPiece.color + (canHold ? '' : +'80');
     });
   }
 
