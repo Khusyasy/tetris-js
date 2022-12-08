@@ -795,7 +795,24 @@ function gameLoop() {
 
   let tempGravityInterval = scaledGravityInterval;
   if (currY == ghostY) {
-    tempGravityInterval = scaledGravityInterval * 4;
+    if (tempGravityInterval >= 1000) {
+      tempGravityInterval = scaledGravityInterval * 1;
+    } else if (tempGravityInterval >= 500) {
+      tempGravityInterval = scaledGravityInterval * 1.25;
+    } else if (tempGravityInterval >= 200) {
+      tempGravityInterval = scaledGravityInterval * 3;
+    } else if (tempGravityInterval >= 100) {
+      tempGravityInterval = scaledGravityInterval * 4;
+    }
+    if (
+      getInput('mv_left') ||
+      getInput('mv_right') ||
+      getInput('rot_ccw') ||
+      getInput('rot_cw') ||
+      getInput('rot_180')
+    ) {
+      gravityCounter -= deltaTime * 0.9;
+    }
   } else if (getInput('softdrop')) {
     tempGravityInterval = scaledGravityInterval / PARAMETER.softdrop_mult.value;
   }
