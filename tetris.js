@@ -49,14 +49,15 @@ function setCookie(name, value, exp_days) {
   document.cookie = name + '=' + value + ';' + expires + ';path=/';
 }
 
+const STORAGE_TAG = 'V1_';
 function storageGet(key) {
   // return localStorage.getItem(key);
-  return decodeURIComponent(atob(getCookie(key)));
+  return decodeURIComponent(atob(getCookie(STORAGE_TAG + key)));
 }
 
 function storageSet(key, value) {
   // localStorage.setItem(key, value);
-  setCookie(key, btoa(encodeURIComponent(value)), 365);
+  setCookie(STORAGE_TAG + key, btoa(encodeURIComponent(value)), 365);
 }
 
 // read from local storage
