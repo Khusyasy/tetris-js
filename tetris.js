@@ -1011,6 +1011,9 @@ Object.entries(INPUT_CONFIG).forEach(([name, value]) => {
 
   const editBtn = document.createElement('button');
   editBtn.innerText = 'Change';
+  if (USE_DEFAULT_KEYBINDS) {
+    editBtn.disabled = true;
+  }
   function changeKey(e) {
     editActive = name;
     // check duplicate
