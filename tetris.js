@@ -672,10 +672,10 @@ function gameLoop() {
     newRotation = (4 + (currRotation - 1)) % 4;
     if (newRotation != currRotation && !keysHold['rot_ccw']) {
       for (const [kx, ky] of KICK_TABLE_USED[currRotation][newRotation]) {
-        if (validShapePlace(currPiece, newRotation, currX + kx, currY + ky)) {
+        if (validShapePlace(currPiece, newRotation, currX + kx, currY - ky)) {
           currRotation = newRotation;
           currX += kx;
-          currY += ky;
+          currY -= ky;
           break;
         }
       }
@@ -688,10 +688,10 @@ function gameLoop() {
     newRotation = (4 + (currRotation + 1)) % 4;
     if (newRotation != currRotation && !keysHold['rot_cw']) {
       for (const [kx, ky] of KICK_TABLE_USED[currRotation][newRotation]) {
-        if (validShapePlace(currPiece, newRotation, currX + kx, currY + ky)) {
+        if (validShapePlace(currPiece, newRotation, currX + kx, currY - ky)) {
           currRotation = newRotation;
           currX += kx;
-          currY += ky;
+          currY -= ky;
           break;
         }
       }
