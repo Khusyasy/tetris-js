@@ -9,9 +9,11 @@ const resetBtn = document.getElementById('reset');
 
 const keybindsModal = document.getElementById('keybinds-modal');
 const customKeybindsBtn = document.getElementById('custom-keybinds');
+const keybindsBtn = document.getElementById('btn-keybinds');
 
 const parameterModal = document.getElementById('parameter-modal');
 const resetParameterBtn = document.getElementById('reset-parameter');
+const parameterBtn = document.getElementById('btn-parameter');
 
 const keysDown = {};
 let prevKeysDown = {};
@@ -604,10 +606,7 @@ let currPiece = null;
 let currRotation = 0;
 let canHold = true;
 
-let moveInterval = 120;
 let moveCounter = 0;
-
-let gravityInterval = 200;
 let gravityCounter = 0;
 
 function resetPiece() {
@@ -700,7 +699,7 @@ function gameLoop() {
   }
   if (getInput('mv_left', true) || getInput('mv_right', true)) {
     moveCounter += deltaTime;
-    if (moveCounter >= moveInterval) {
+    if (moveCounter >= PARAMETER.move_repeat.value) {
       moveCounter = 0;
       currX += dx;
     }
@@ -772,7 +771,7 @@ function gameLoop() {
   gravityCounter += deltaTime;
   let reset = false;
   let scaledGravityInterval =
-    gravityInterval - Math.floor(linesCleared / 10) * 20;
+    PARAMETER.gravity_interval.value - Math.floor(linesCleared / 10) * 20;
   if (scaledGravityInterval < 20) {
     scaledGravityInterval = 20;
   }
@@ -781,7 +780,7 @@ function gameLoop() {
   if (currY == ghostY) {
     tempGravityInterval = scaledGravityInterval * 4;
   } else if (getInput('softdrop')) {
-    tempGravityInterval = scaledGravityInterval / 4;
+    tempGravityInterval = scaledGravityInterval / PARAMETER.softdrop_mult.value;
   }
   if (gravityCounter >= tempGravityInterval) {
     gravityCounter = 0;
@@ -931,6 +930,13 @@ function newGame() {
 }
 newGame();
 
+function pauseGame() {
+  playing = false;
+  startBtn.innerText = 'Start';
+  clearInterval(gameInterval);
+  clearInterval(countdownInterval);
+}
+
 let playing = false;
 let countdownInterval = null;
 let countdown = 1;
@@ -947,17 +953,14 @@ startBtn.addEventListener('click', () => {
         startBtn.innerText = 'Pause';
         lastTime = performance.now();
         gameLoop();
-        gameInterval = setInterval(gameLoop, 1000 / 240);
+        gameInterval = setInterval(gameLoop, 1000 / PARAMETER.FPS.value);
         clearInterval(countdownInterval);
       }
     };
     countdownFunc();
     countdownInterval = setInterval(countdownFunc, 1000);
   } else {
-    playing = false;
-    startBtn.innerText = 'Start';
-    clearInterval(gameInterval);
-    clearInterval(countdownInterval);
+    pauseGame();
   }
   startBtn.blur();
 });
@@ -1049,6 +1052,8 @@ customKeybindsBtn.addEventListener('click', () => {
   }
 });
 
+keybindsBtn.addEventListener('click', pauseGame);
+
 const parameterElements = {};
 Object.entries(PARAMETER).forEach(([name, data]) => {
   const divEl = document.createElement('div');
@@ -1106,3 +1111,5 @@ resetParameterBtn.addEventListener('click', () => {
   });
   resetParameterBtn.blur();
 });
+
+parameterBtn.addEventListener('click', pauseGame);
