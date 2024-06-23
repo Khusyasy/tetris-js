@@ -15,15 +15,15 @@ const parameterModal = document.getElementById('parameter-modal');
 const resetParameterBtn = document.getElementById('reset-parameter');
 const parameterBtn = document.getElementById('btn-parameter');
 
-const keysDown = {};
-let prevKeysDown = {};
-const keysHold = {};
+const KEYS_DOWN = {};
+let KEYS_DOWN_PREV = {};
+const KEYS_HOLD = {};
 
 document.addEventListener('keydown', (e) => {
-  keysDown[e.key] = true;
+  KEYS_DOWN[e.key] = true;
 });
 document.addEventListener('keyup', (e) => {
-  delete keysDown[e.key];
+  delete KEYS_DOWN[e.key];
 });
 
 function getCookie(name) {
@@ -143,14 +143,14 @@ storageSet('PARAMETER', JSON.stringify(PARAMETER));
 function getInput(key, prev = false) {
   if (USE_DEFAULT_KEYBINDS) {
     if (prev) {
-      return prevKeysDown[DEFAULT_INPUT_CONFIG[key]];
+      return KEYS_DOWN_PREV[DEFAULT_INPUT_CONFIG[key]];
     }
-    return keysDown[DEFAULT_INPUT_CONFIG[key]];
+    return KEYS_DOWN[DEFAULT_INPUT_CONFIG[key]];
   } else {
     if (prev) {
-      return prevKeysDown[INPUT_CONFIG[key]];
+      return KEYS_DOWN_PREV[INPUT_CONFIG[key]];
     }
-    return keysDown[INPUT_CONFIG[key]];
+    return KEYS_DOWN[INPUT_CONFIG[key]];
   }
 }
 
@@ -534,50 +534,50 @@ class GridCell {
   }
 }
 
-const playGrid = [];
-const playWidth = 10;
-const playHeight = 23;
-for (let i = 0; i < playHeight; i++) {
-  playGrid.push([]);
-  for (let j = 0; j < playWidth; j++) {
+const GRID_PLAY = [];
+const GRID_PLAY_WIDTH = 10;
+const GRID_PLAY_HEIGHT = 23;
+for (let i = 0; i < GRID_PLAY_HEIGHT; i++) {
+  GRID_PLAY.push([]);
+  for (let j = 0; j < GRID_PLAY_WIDTH; j++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     gridEl.appendChild(cell);
-    playGrid[i].push(new GridCell(COLOR_BLANK, cell));
+    GRID_PLAY[i].push(new GridCell(COLOR_BLANK, cell));
   }
 }
 
-const nextGrid = [];
-const nextWidth = 4;
-const nextHeight = 20;
-for (let i = 0; i < nextHeight; i++) {
-  nextGrid.push([]);
-  for (let j = 0; j < nextWidth; j++) {
+const GRID_NEXT = [];
+const GRID_NEXT_WIDTH = 4;
+const GRID_NEXT_HEIGHT = 20;
+for (let i = 0; i < GRID_NEXT_HEIGHT; i++) {
+  GRID_NEXT.push([]);
+  for (let j = 0; j < GRID_NEXT_WIDTH; j++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     nextEl.appendChild(cell);
-    nextGrid[i].push(new GridCell(COLOR_BLANK, cell));
+    GRID_NEXT[i].push(new GridCell(COLOR_BLANK, cell));
   }
 }
 
 let holdPiece = null;
-const holdGrid = [];
-const holdWidth = 4;
-const holdHeight = 4;
-for (let i = 0; i < holdHeight; i++) {
-  holdGrid.push([]);
-  for (let j = 0; j < holdWidth; j++) {
+const GRID_HOLD = [];
+const GRID_HOLD_WIDTH = 4;
+const GRID_HOLD_HEIGHT = 4;
+for (let i = 0; i < GRID_HOLD_HEIGHT; i++) {
+  GRID_HOLD.push([]);
+  for (let j = 0; j < GRID_HOLD_WIDTH; j++) {
     const cell = document.createElement('div');
     cell.classList.add('cell');
     holdEl.appendChild(cell);
-    holdGrid[i].push(new GridCell(COLOR_BLANK, cell));
+    GRID_HOLD[i].push(new GridCell(COLOR_BLANK, cell));
   }
 }
 
 let score = 0;
 let linesCleared = 0;
 function updateDOM() {
-  playGrid.forEach((row, i) => {
+  GRID_PLAY.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.htmlEl.style.setProperty('--cell-color', cell.col);
@@ -589,7 +589,7 @@ function updateDOM() {
   scoreEl.innerText = `Score: ${score}`;
   linesEl.innerText = `Lines Cleared: ${linesCleared}`;
   // show next pieces
-  nextGrid.forEach((row, i) => {
+  GRID_NEXT.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.htmlEl.style.setProperty('--cell-color', cell.col);
@@ -599,7 +599,7 @@ function updateDOM() {
     });
   });
   // show hold piece
-  holdGrid.forEach((row, i) => {
+  GRID_HOLD.forEach((row, i) => {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.htmlEl.style.setProperty('--cell-color', cell.col);
@@ -621,7 +621,7 @@ let delayMoveCounter = 0;
 let gravityCounter = 0;
 
 function resetPiece() {
-  currX = Math.floor(playWidth / 2) - 1;
+  currX = Math.floor(GRID_PLAY_WIDTH / 2) - 1;
   currY = 2;
   currRotation = 0;
 }
@@ -648,21 +648,21 @@ function newPiece() {
 
 function clearGrid() {
   // clear play grid
-  for (let i = 0; i < playHeight; i++) {
-    for (let j = 0; j < playWidth; j++) {
-      if (!playGrid[i][j].isPlaced) {
-        playGrid[i][j].col = COLOR_BLANK;
+  for (let i = 0; i < GRID_PLAY_HEIGHT; i++) {
+    for (let j = 0; j < GRID_PLAY_WIDTH; j++) {
+      if (!GRID_PLAY[i][j].isPlaced) {
+        GRID_PLAY[i][j].col = COLOR_BLANK;
       }
     }
   }
   // clear hold grid
-  holdGrid.forEach((row) => {
+  GRID_HOLD.forEach((row) => {
     row.forEach((cell) => {
       cell.col = COLOR_BLANK;
     });
   });
   // clear next grid
-  nextGrid.forEach((row) => {
+  GRID_NEXT.forEach((row) => {
     row.forEach((cell) => {
       cell.col = COLOR_BLANK;
     });
@@ -676,13 +676,13 @@ function validShapePlace(piece, rotation, x, y) {
     const [px, py] = piece.shapes[rotation][i];
     if (
       x + px < 0 ||
-      x + px >= playWidth ||
+      x + px >= GRID_PLAY_WIDTH ||
       y + py < 0 ||
-      y + py >= playHeight
+      y + py >= GRID_PLAY_HEIGHT
     ) {
       return false;
     }
-    if (playGrid[y + py][x + px].isPlaced) {
+    if (GRID_PLAY[y + py][x + px].isPlaced) {
       return false;
     }
   }
@@ -717,10 +717,9 @@ function startStopGame() {
   }
   startBtn.blur();
 }
-startBtn.addEventListener('click', startStopGame);
 
 function newGame() {
-  playGrid.forEach((row) => {
+  GRID_PLAY.forEach((row) => {
     row.forEach((cell) => {
       cell.clear();
     });
@@ -754,23 +753,23 @@ function gameLoop(once = false) {
   // global inputs
   if (!once) {
     if (getInput('start_stop')) {
-      if (!keysHold['start_stop']) {
+      if (!KEYS_HOLD['start_stop']) {
         startStopGame();
-        keysHold['start_stop'] = true;
+        KEYS_HOLD['start_stop'] = true;
       }
       return;
     } else {
-      keysHold['start_stop'] = false;
+      KEYS_HOLD['start_stop'] = false;
     }
 
     if (getInput('reset')) {
-      if(!keysHold['reset']) {
+      if(!KEYS_HOLD['reset']) {
         resetGame();
-        keysHold['reset'] = true;
+        KEYS_HOLD['reset'] = true;
       }
       return;
     } else {
-      keysHold['reset'] = false;
+      KEYS_HOLD['reset'] = false;
     }
 
     if (!PLAYING) return;
@@ -817,7 +816,7 @@ function gameLoop(once = false) {
   const KICK_TABLE_USED = currPiece.name == 'I' ? KICK_TABLE_I : KICK_TABLE;
   if (getInput('rot_ccw')) {
     newRotation = (4 + (currRotation - 1)) % 4;
-    if (newRotation != currRotation && !keysHold['rot_ccw']) {
+    if (newRotation != currRotation && !KEYS_HOLD['rot_ccw']) {
       for (const [kx, ky] of KICK_TABLE_USED[currRotation][newRotation]) {
         if (validShapePlace(currPiece, newRotation, currX + kx, currY - ky)) {
           currRotation = newRotation;
@@ -826,14 +825,14 @@ function gameLoop(once = false) {
           break;
         }
       }
-      keysHold['rot_ccw'] = true;
+      KEYS_HOLD['rot_ccw'] = true;
     }
   } else {
-    keysHold['rot_ccw'] = false;
+    KEYS_HOLD['rot_ccw'] = false;
   }
   if (getInput('rot_cw')) {
     newRotation = (4 + (currRotation + 1)) % 4;
-    if (newRotation != currRotation && !keysHold['rot_cw']) {
+    if (newRotation != currRotation && !KEYS_HOLD['rot_cw']) {
       for (const [kx, ky] of KICK_TABLE_USED[currRotation][newRotation]) {
         if (validShapePlace(currPiece, newRotation, currX + kx, currY - ky)) {
           currRotation = newRotation;
@@ -842,21 +841,21 @@ function gameLoop(once = false) {
           break;
         }
       }
-      keysHold['rot_cw'] = true;
+      KEYS_HOLD['rot_cw'] = true;
     }
   } else {
-    keysHold['rot_cw'] = false;
+    KEYS_HOLD['rot_cw'] = false;
   }
   if (getInput('rot_180')) {
     newRotation = (4 + (currRotation + 2)) % 4;
-    if (newRotation != currRotation && !keysHold['rot_180']) {
+    if (newRotation != currRotation && !KEYS_HOLD['rot_180']) {
       if (validShapePlace(currPiece, newRotation, currX, currY)) {
         currRotation = newRotation;
       }
-      keysHold['rot_180'] = true;
+      KEYS_HOLD['rot_180'] = true;
     }
   } else {
-    keysHold['rot_180'] = false;
+    KEYS_HOLD['rot_180'] = false;
   }
 
   // draw ghost piece placement
@@ -868,7 +867,7 @@ function gameLoop(once = false) {
     const [px, py] = currPiece.shapes[currRotation][i];
     const ty = ghostY - currPiece.centerY + py;
     const tx = currX - currPiece.centerX + px;
-    playGrid[ty][tx].col = COLOR_GHOST;
+    GRID_PLAY[ty][tx].col = COLOR_GHOST;
   }
 
   // gravity
@@ -912,7 +911,7 @@ function gameLoop(once = false) {
         const [px, py] = currPiece.shapes[currRotation][i];
         const ty = currY - currPiece.centerY + py;
         const tx = currX - currPiece.centerX + px;
-        playGrid[ty][tx].isPlaced = true;
+        GRID_PLAY[ty][tx].isPlaced = true;
       }
       reset = true;
     }
@@ -920,22 +919,22 @@ function gameLoop(once = false) {
   }
 
   // harddrop
-  if (!keysHold['harddrop']) {
+  if (!KEYS_HOLD['harddrop']) {
     if (getInput('harddrop')) {
-      keysHold['harddrop'] = true;
+      KEYS_HOLD['harddrop'] = true;
       currY = ghostY;
       // place piece
       for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
         const [px, py] = currPiece.shapes[currRotation][i];
         const ty = currY - currPiece.centerY + py;
         const tx = currX - currPiece.centerX + px;
-        playGrid[ty][tx].isPlaced = true;
+        GRID_PLAY[ty][tx].isPlaced = true;
       }
       reset = true;
     }
   }
   if (!getInput('harddrop')) {
-    keysHold['harddrop'] = false;
+    KEYS_HOLD['harddrop'] = false;
   }
 
   // draw piece
@@ -943,16 +942,16 @@ function gameLoop(once = false) {
     const [px, py] = currPiece.shapes[currRotation][i];
     const ty = currY - currPiece.centerY + py;
     const tx = currX - currPiece.centerX + px;
-    playGrid[ty][tx].col = currPiece.color;
+    GRID_PLAY[ty][tx].col = currPiece.color;
   }
 
   if (reset) {
     // check for full rows
     const fullRows = [];
-    for (let i = 0; i < playHeight; i++) {
+    for (let i = 0; i < GRID_PLAY_HEIGHT; i++) {
       let full = true;
-      for (let j = 0; j < playWidth; j++) {
-        if (!playGrid[i][j].isPlaced) {
+      for (let j = 0; j < GRID_PLAY_WIDTH; j++) {
+        if (!GRID_PLAY[i][j].isPlaced) {
           full = false;
           continue;
         }
@@ -964,13 +963,13 @@ function gameLoop(once = false) {
     // remove full rows
     for (let i = 0; i < fullRows.length; i++) {
       for (let j = fullRows[i]; j >= 0; j--) {
-        for (let k = 0; k < playWidth; k++) {
+        for (let k = 0; k < GRID_PLAY_WIDTH; k++) {
           if (j == 0) {
-            playGrid[j][k].isPlaced = false;
-            playGrid[j][k].col = COLOR_BLANK;
+            GRID_PLAY[j][k].isPlaced = false;
+            GRID_PLAY[j][k].col = COLOR_BLANK;
           } else {
-            playGrid[j][k].isPlaced = playGrid[j - 1][k].isPlaced;
-            playGrid[j][k].col = playGrid[j - 1][k].col;
+            GRID_PLAY[j][k].isPlaced = GRID_PLAY[j - 1][k].isPlaced;
+            GRID_PLAY[j][k].col = GRID_PLAY[j - 1][k].col;
           }
         }
       }
@@ -990,7 +989,7 @@ function gameLoop(once = false) {
   }
 
   // check to swap hold piece
-  if (!keysHold['hold']) {
+  if (!KEYS_HOLD['hold']) {
     if (getInput('hold') && canHold) {
       if (holdPiece) {
         const temp = holdPiece;
@@ -1001,12 +1000,12 @@ function gameLoop(once = false) {
         holdPiece = currPiece;
         newPiece();
       }
-      keysHold['hold'] = true;
+      KEYS_HOLD['hold'] = true;
       canHold = false;
     }
   }
   if (!getInput('hold')) {
-    keysHold['hold'] = false;
+    KEYS_HOLD['hold'] = false;
   }
 
   // update holdGrid
@@ -1015,7 +1014,7 @@ function gameLoop(once = false) {
       const [x, y] = pos;
       const ty = 2 + y - holdPiece.centerY;
       const tx = 1 + x - holdPiece.centerX;
-      holdGrid[ty][tx].col = holdPiece.color + (canHold ? '' : +'80');
+      GRID_HOLD[ty][tx].col = holdPiece.color + (canHold ? '' : +'80');
     });
   }
 
@@ -1026,14 +1025,12 @@ function gameLoop(once = false) {
       const [x, y] = pos;
       const ty = i * 4 + 2 + y - showPiece.centerY;
       const tx = 1 + x - showPiece.centerX;
-      nextGrid[ty][tx].col = showPiece.color;
+      GRID_NEXT[ty][tx].col = showPiece.color;
     });
   }
   updateDOM();
-  prevKeysDown = JSON.parse(JSON.stringify(keysDown));
+  KEYS_DOWN_PREV = JSON.parse(JSON.stringify(KEYS_DOWN));
 }
-
-resetBtn.addEventListener('click', resetGame);
 
 const editElements = {};
 let editActive = null;
@@ -1116,8 +1113,6 @@ customKeybindsBtn.addEventListener('click', () => {
   }
 });
 
-keybindsBtn.addEventListener('click', pauseGame);
-
 const parameterElements = {};
 Object.entries(PARAMETER).forEach(([name, data]) => {
   const divEl = document.createElement('div');
@@ -1176,6 +1171,10 @@ resetParameterBtn.addEventListener('click', () => {
   resetParameterBtn.blur();
 });
 
+// BUTTONS
+startBtn.addEventListener('click', startStopGame);
+resetBtn.addEventListener('click', resetGame);
+keybindsBtn.addEventListener('click', pauseGame);
 parameterBtn.addEventListener('click', pauseGame);
 
 function init() {
