@@ -62,6 +62,8 @@ function storageSet(key, value) {
 
 // read from local storage
 const DEFAULT_INPUT_CONFIG = {
+  start_stop: '1',
+  reset: 'r',
   mv_left: 'a',
   mv_right: 'd',
   softdrop: 'w',
@@ -640,7 +642,7 @@ function newPiece() {
   if (!validShapePlace(currPiece, 0, currX, currY)) {
     startBtn.innerText = 'Game Over';
     startBtn.disabled = true;
-    clearInterval(gameInterval);
+    clearInterval(GAME_INTERVAL);
   }
 }
 
@@ -687,11 +689,96 @@ function validShapePlace(piece, rotation, x, y) {
   return true;
 }
 
-let gameInterval = null;
-let lastTime = performance.now();
-function gameLoop() {
-  const deltaTime = performance.now() - lastTime;
-  lastTime = performance.now();
+let PLAYING = false;
+let COUNTDOWN_INTERVAL = null;
+let COUNTDOWN_TIME = 3;
+let GAME_INTERVAL = null;
+let LAST_TIME = performance.now();
+
+function startStopGame() {
+  if (!PLAYING) {
+    COUNTDOWN_TIME = 3;
+    clearInterval(COUNTDOWN_INTERVAL);
+    const countdownFunc = () => {
+      if (COUNTDOWN_TIME > 0) {
+        startBtn.innerText = COUNTDOWN_TIME;
+        COUNTDOWN_TIME--;
+      } else {
+        startBtn.innerText = 'Pause';
+        LAST_TIME = performance.now();
+        PLAYING = true;
+        clearInterval(COUNTDOWN_INTERVAL);
+      }
+    };
+    countdownFunc();
+    COUNTDOWN_INTERVAL = setInterval(countdownFunc, 1000);
+  } else {
+    pauseGame();
+  }
+  startBtn.blur();
+}
+startBtn.addEventListener('click', startStopGame);
+
+function newGame() {
+  playGrid.forEach((row) => {
+    row.forEach((cell) => {
+      cell.clear();
+    });
+  });
+  holdPiece = null;
+  bag = [];
+  score = 0;
+  linesCleared = 0;
+  clearGrid();
+  newPiece();
+  updateDOM();
+  gameLoop(true);
+  LAST_TIME = performance.now();
+}
+
+function pauseGame() {
+  PLAYING = false;
+  startBtn.innerText = 'Start';
+  clearInterval(COUNTDOWN_INTERVAL);
+}
+
+function resetGame() {
+  PLAYING = false;
+  newGame();
+  startBtn.innerText = 'Start';
+  startBtn.disabled = false;
+  resetBtn.blur();
+}
+
+function gameLoop(once = false) {
+  // global inputs
+  if (!once) {
+    if (getInput('start_stop')) {
+      if (!keysHold['start_stop']) {
+        startStopGame();
+        keysHold['start_stop'] = true;
+      }
+      return;
+    } else {
+      keysHold['start_stop'] = false;
+    }
+
+    if (getInput('reset')) {
+      if(!keysHold['reset']) {
+        resetGame();
+        keysHold['reset'] = true;
+      }
+      return;
+    } else {
+      keysHold['reset'] = false;
+    }
+
+    if (!PLAYING) return;
+  }
+
+  // main game loop
+  const deltaTime = performance.now() - LAST_TIME;
+  LAST_TIME = performance.now();
   clearGrid();
 
   // move
@@ -946,67 +1033,7 @@ function gameLoop() {
   prevKeysDown = JSON.parse(JSON.stringify(keysDown));
 }
 
-function newGame() {
-  playGrid.forEach((row) => {
-    row.forEach((cell) => {
-      cell.clear();
-    });
-  });
-  holdPiece = null;
-  bag = [];
-  score = 0;
-  linesCleared = 0;
-  clearGrid();
-  newPiece();
-  updateDOM();
-  lastTime = performance.now();
-  gameLoop();
-}
-newGame();
-
-function pauseGame() {
-  playing = false;
-  startBtn.innerText = 'Start';
-  clearInterval(gameInterval);
-  clearInterval(countdownInterval);
-}
-
-let playing = false;
-let countdownInterval = null;
-let countdown = 1;
-startBtn.addEventListener('click', () => {
-  if (!playing) {
-    playing = true;
-    countdown = 1;
-    clearInterval(countdownInterval);
-    const countdownFunc = () => {
-      if (countdown > 0) {
-        startBtn.innerText = countdown;
-        countdown--;
-      } else {
-        startBtn.innerText = 'Pause';
-        lastTime = performance.now();
-        gameLoop();
-        gameInterval = setInterval(gameLoop, 1000 / PARAMETER.FPS.value);
-        clearInterval(countdownInterval);
-      }
-    };
-    countdownFunc();
-    countdownInterval = setInterval(countdownFunc, 1000);
-  } else {
-    pauseGame();
-  }
-  startBtn.blur();
-});
-
-resetBtn.addEventListener('click', () => {
-  newGame();
-  playing = false;
-  startBtn.innerText = 'Start';
-  startBtn.disabled = false;
-  clearInterval(gameInterval);
-  resetBtn.blur();
-});
+resetBtn.addEventListener('click', resetGame);
 
 const editElements = {};
 let editActive = null;
@@ -1150,3 +1177,13 @@ resetParameterBtn.addEventListener('click', () => {
 });
 
 parameterBtn.addEventListener('click', pauseGame);
+
+function init() {
+  newGame();
+  gameLoop(true);
+  GAME_INTERVAL = setInterval(gameLoop, 1000 / PARAMETER.FPS.value);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  init();
+});
