@@ -49,7 +49,7 @@ function setCookie(name, value, exp_days) {
   document.cookie = name + '=' + value + ';' + expires + ';path=/';
 }
 
-const STORAGE_TAG = 'V2_';
+const STORAGE_TAG = 'V3_';
 function storageGet(key) {
   // return localStorage.getItem(key);
   return decodeURIComponent(atob(getCookie(STORAGE_TAG + key)));
@@ -95,6 +95,13 @@ if (USE_DEFAULT_KEYBINDS) {
 
 // read from local storage
 const DEFAULT_PARAMETER = {
+  countdown: {
+    min: 0,
+    max: 10,
+    step: 1,
+    value: 3,
+    unit: 's',
+  },
   FPS: {
     min: 10,
     max: 1000,
@@ -703,18 +710,18 @@ function validShapePlace(piece, rotation, x, y) {
 
 let PLAYING = false;
 let COUNTDOWN_INTERVAL = null;
-let COUNTDOWN_TIME = 3;
+let COUNTDOWN_LEFT = PARAMETER.countdown.value;
 let GAME_INTERVAL = null;
 let LAST_TIME = performance.now();
 
 function startStopGame() {
   if (!PLAYING) {
-    COUNTDOWN_TIME = 3;
+    COUNTDOWN_LEFT = PARAMETER.countdown.value;
     clearInterval(COUNTDOWN_INTERVAL);
     const countdownFunc = () => {
-      if (COUNTDOWN_TIME > 0) {
-        startBtn.innerText = COUNTDOWN_TIME;
-        COUNTDOWN_TIME--;
+      if (COUNTDOWN_LEFT > 0) {
+        startBtn.innerText = COUNTDOWN_LEFT;
+        COUNTDOWN_LEFT--;
       } else {
         startBtn.innerText = 'Pause';
         LAST_TIME = performance.now();
