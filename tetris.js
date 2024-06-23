@@ -111,21 +111,21 @@ const DEFAULT_PARAMETER = {
   },
   softdrop_mult: {
     min: 1,
-    max: 40,
+    max: 41,
     step: 1,
     value: 6,
     unit: 'x',
   },
   ARR: {
-    min: 10,
-    max: 500,
+    min: 0,
+    max: 100,
     step: 5,
     value: 30,
     unit: 'ms',
   },
   DAS: {
-    min: 10,
-    max: 500,
+    min: 20,
+    max: 400,
     step: 5,
     value: 160,
     unit: 'ms',
@@ -802,9 +802,15 @@ function gameLoop(once = false) {
       delayMoveCounter += deltaTime;
     } else {
       moveCounter += deltaTime;
-      if (moveCounter >= PARAMETER.ARR.value) {
-        moveCounter = 0;
-        currX += dx;
+      if (PARAMETER.ARR.value == 0) {  // special case, instant move
+        while (validShapePlace(currPiece, currRotation, currX + dx, currY)) {
+          currX += dx;
+        }
+      } else {
+        if (moveCounter >= PARAMETER.ARR.value) {
+          moveCounter = 0;
+          currX += dx;
+        }
       }
     }
   } else {
@@ -900,7 +906,15 @@ function gameLoop(once = false) {
       gravityCounter -= deltaTime * 0.9;
     }
   } else if (getInput('softdrop')) {
-    tempGravityInterval = scaledGravityInterval / PARAMETER.softdrop_mult.value;
+    if (
+      PARAMETER.softdrop_mult.value == PARAMETER.softdrop_mult.max
+      && currY != ghostY
+    ) {  // special case, instant drop
+      gravityCounter = 0;
+      currY = ghostY;
+    } else {
+      tempGravityInterval = scaledGravityInterval / (PARAMETER.softdrop_mult.value * 4);
+    }
   }
   if (gravityCounter >= tempGravityInterval) {
     if (validShapePlace(currPiece, currRotation, currX, currY + 1)) {
@@ -919,11 +933,11 @@ function gameLoop(once = false) {
   }
 
   // harddrop
-  if (!KEYS_HOLD['harddrop']) {
-    if (getInput('harddrop')) {
+  if (getInput('harddrop')) {
+    if (!KEYS_HOLD['harddrop']) {
       KEYS_HOLD['harddrop'] = true;
-      currY = ghostY;
       // place piece
+      currY = ghostY;
       for (let i = 0; i < currPiece.shapes[currRotation].length; i++) {
         const [px, py] = currPiece.shapes[currRotation][i];
         const ty = currY - currPiece.centerY + py;
@@ -932,8 +946,7 @@ function gameLoop(once = false) {
       }
       reset = true;
     }
-  }
-  if (!getInput('harddrop')) {
+  } else {
     KEYS_HOLD['harddrop'] = false;
   }
 
@@ -1147,6 +1160,12 @@ Object.entries(PARAMETER).forEach(([name, data]) => {
   inputEl.addEventListener('input', () => {
     PARAMETER[name].value = inputEl.value;
     valueEl.innerText = inputEl.value;
+    // special cases
+    if (name == 'softdrop_mult') {
+      if (inputEl.value == data.max) {
+        valueEl.innerText = '∞';
+      }
+    }
     storageSet('PARAMETER', JSON.stringify(PARAMETER));
   });
 
@@ -1185,4 +1204,10 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', () => {
   init();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    pauseGame();
+  }
 });
