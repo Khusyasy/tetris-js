@@ -49,7 +49,7 @@ function setCookie(name, value, exp_days) {
   document.cookie = name + '=' + value + ';' + expires + ';path=/';
 }
 
-const STORAGE_TAG = 'V1_';
+const STORAGE_TAG = 'V2_';
 function storageGet(key) {
   // return localStorage.getItem(key);
   return decodeURIComponent(atob(getCookie(STORAGE_TAG + key)));
