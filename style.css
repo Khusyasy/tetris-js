@@ -43,7 +43,7 @@ body {
   height: calc(var(--cell-size));
   display: inline-block;
   background-color: var(--cell-color);
-  border: 1px solid var(--cell-color, var(--grid-border-color));
+  border: 1px solid var(--cell-border-color, var(--grid-border-color));
 }
 
 .side-info {

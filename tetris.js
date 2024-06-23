@@ -527,10 +527,12 @@ class GridCell {
     this.col = col;
     this.htmlEl = htmlEl;
     this.isPlaced = isPlaced;
+    this.isActive = false;
   }
   clear() {
     this.col = COLOR_BLANK;
     this.isPlaced = false;
+    this.isActive = false;
   }
 }
 
@@ -581,8 +583,14 @@ function updateDOM() {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.htmlEl.style.setProperty('--cell-color', cell.col);
+        cell.htmlEl.style.setProperty('--cell-border-color', cell.col);
+        if (cell.isActive) {
+          cell.htmlEl.style.setProperty('--cell-border-color', COLOR_GHOST);
+          cell.isActive = false;
+        }
       } else {
         cell.htmlEl.style.removeProperty('--cell-color');
+        cell.htmlEl.style.removeProperty('--cell-border-color');
       }
     });
   });
@@ -593,8 +601,10 @@ function updateDOM() {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.htmlEl.style.setProperty('--cell-color', cell.col);
+        cell.htmlEl.style.setProperty('--cell-border-color', cell.col);
       } else {
         cell.htmlEl.style.removeProperty('--cell-color');
+        cell.htmlEl.style.removeProperty('--cell-border-color');
       }
     });
   });
@@ -603,8 +613,10 @@ function updateDOM() {
     row.forEach((cell, j) => {
       if (cell.col !== COLOR_BLANK) {
         cell.htmlEl.style.setProperty('--cell-color', cell.col);
+        cell.htmlEl.style.setProperty('--cell-border-color', cell.col);
       } else {
         cell.htmlEl.style.removeProperty('--cell-color');
+        cell.htmlEl.style.removeProperty('--cell-border-color');
       }
     });
   });
@@ -956,6 +968,7 @@ function gameLoop(once = false) {
     const ty = currY - currPiece.centerY + py;
     const tx = currX - currPiece.centerX + px;
     GRID_PLAY[ty][tx].col = currPiece.color;
+    GRID_PLAY[ty][tx].isActive = true;
   }
 
   if (reset) {
