@@ -1,7 +1,7 @@
 :root {
   font-size: 16px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  --cell-size: 1.75rem;
+  --cell-size: 3vh;
   --grid-background-color: #1c1d1d;
   --grid-border-color: #2b2929;
 }
@@ -56,7 +56,7 @@ body {
 }
 
 .hold {
-  --cell-size: 1.5rem;
+  --cell-size: 2.5vh;
   width: calc((var(--cell-size) * 4));
   height: calc((var(--cell-size) * 4));
   display: grid;
@@ -66,7 +66,7 @@ body {
 }
 
 .next {
-  --cell-size: 1.5rem;
+  --cell-size: 2.5vh;
   width: calc((var(--cell-size) * 4));
   height: calc((var(--cell-size) * 20));
   display: grid;
@@ -76,14 +76,16 @@ body {
 }
 
 .btn-container {
-  display: block;
   margin: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  row-gap: 0.25rem;
 }
 
 .btn-container .btn {
   display: inline-block;
-  padding: 0.5rem;
-  margin: 0.5rem;
+  padding: 0.25rem 0.5rem;
   background-color: #e0e0e0;
   border: 1px solid black;
   border-radius: 0.5rem;
@@ -105,8 +107,13 @@ body {
 
 .modal-close {
   position: absolute;
-  top: 0.25rem;
+  display: block;
+  top: 0.5rem;
   right: 0.5rem;
+  border: 1px solid black;
+  line-height: 0;
+  border-radius: 0.25rem;
+  cursor: pointer;
 }
 
 .modal-body {
@@ -119,12 +126,13 @@ body {
   padding: 2rem 1rem;
 }
 
-input:checked ~ .modal-overlay {
+input:checked~.modal-overlay {
   display: block;
   opacity: 1;
   pointer-events: auto;
 }
-input:checked ~ .modal-overlay .modal-body {
+
+input:checked~.modal-overlay .modal-body {
   transform: translate(-50%, -50%);
 }
 
