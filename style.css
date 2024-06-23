@@ -105,25 +105,33 @@ body {
   transition: opacity 0.1s ease-in-out;
 }
 
+.modal-close-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
 .modal-close {
-  position: absolute;
   display: block;
-  top: 0.5rem;
-  right: 0.5rem;
   border: 1px solid black;
   line-height: 0;
   border-radius: 0.25rem;
   cursor: pointer;
+  width: min-content;
+  float: inline-end;
 }
 
 .modal-body {
   position: fixed;
+  display: flex;
+  flex-direction: column;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -70%);
   transition: transform 0.3s ease-in-out;
   background-color: #e0e0e0;
-  padding: 2rem 1rem;
+  padding: 1rem;
+  border-radius: 1rem;
 }
 
 input:checked~.modal-overlay {
